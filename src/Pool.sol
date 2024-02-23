@@ -6,7 +6,6 @@ import {IFactory} from "./interfaces/IFactory.sol";
 import {SafeMath} from "./libraries/SafeMath.sol";
 import {LP_ERC20} from "./LP_ERC20.sol";
 import {ReentrancyGuard} from "./utils/ReentrancyGuard.sol";
-import {SafeERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import {PoolLibrary} from "./libraries/PoolLibrary.sol";
 import {SafeCast} from "./libraries/SafeCast.sol";
 
@@ -16,11 +15,14 @@ import {SafeCast} from "./libraries/SafeCast.sol";
  */
 contract Pool is LP_ERC20, ReentrancyGuard {
     using SafeMath for uint256;
-    using SafeERC20 for IERC20;
 
     event AddLiquidity(uint256 amountA, uint256 amountB, uint256 liquidity);
     event RemoveLiquidity(uint256 liquidity, uint256 amountA, uint256 amountB);
     event Swap(uint256 amountIn, uint256 amountOut, uint256 amountInFee);
+
+    uint public constant MINIMUM_LIQUIDITY = 1000;
+    bytes4 private constant TRANSFER_SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
+    bytes4 private constant TRANSFER_FROM_SELECTOR = bytes4(keccak256(bytes('transferFrom(address,address,uint256)')));
 
     address public immutable FACTORY;
     address public immutable TOKENA;
@@ -46,14 +48,24 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         TICK = _tick;
     }
 
+    function _safeTransfer(address token, address to, uint value) private {
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(TRANSFER_SELECTOR, to, value));
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "POOL : Transfer failed");
+    }
+
+    function _safeTransferFrom(address token, address from, address to, uint value) private {
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(TRANSFER_FROM_SELECTOR, from, to, value));
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "POOL : Transfer from failed");
+    }
+
     /* ------- ADD LIQUIDITY ------- */
     function _addLiquidity(uint256 _amountADesired, uint256 _amountBDesired, uint256 _amountAMin, uint256 _amountBMin)
         public
         view
         returns (uint256 amountA, uint256 amountB)
     {
-        uint256 m_reserveA = getReserveA();
-        uint256 m_reserveB = getReserveB();
+        uint256 m_reserveA = getReserveA();   // 18
+        uint256 m_reserveB = getReserveB();   // 6
 
         // initially liquidity we accept all the tokens
         if (m_reserveA == 0 && m_reserveB == 0) {
@@ -78,7 +90,8 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         uint256 m_reserveB = getReserveB();
 
         if (m_totalSupply == 0) {
-            liquidity = SafeMath.sqrt(_amountA.mul(_amountB));
+            liquidity = (SafeMath.sqrt(_amountA.mul(_amountB))).sub(MINIMUM_LIQUIDITY); 
+            // mimimum liquidity is locked
         } else {
             liquidity = SafeMath.min(
                 (_amountA.mul(m_totalSupply)).div(m_reserveA), (_amountB.mul(m_totalSupply)).div(m_reserveB)
@@ -109,8 +122,8 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         (amountA, amountB) = _addLiquidity(_amountADesired, _amountBDesired, _amountAMin, _amountBMin);
         liquidity = _mintLiquidity(amountA, amountB);
 
-        // SafeERC20.safeTransferFrom(IERC20(TOKENA), msg.sender, address(this), amountA);
-        // SafeERC20.safeTransferFrom(IERC20(TOKENB), msg.sender, address(this), amountB);
+        _safeTransferFrom(TOKENA, msg.sender, address(this), amountA);
+        _safeTransferFrom(TOKENB, msg.sender, address(this), amountB);
 
         _mint(_to, liquidity);
 
@@ -146,8 +159,8 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         (amountA, amountB) = _removeLiquidity(_liquidity, _amountAMin, _amountBMin);
         _burn(msg.sender, _liquidity);
 
-        // SafeERC20.safeTransfer(IERC20(TOKENA), _to, amountA);
-        // SafeERC20.safeTransfer(IERC20(TOKENB), _to, amountB);
+        _safeTransfer(TOKENA, _to, amountA);
+        _safeTransfer(TOKENB, _to, amountB);
 
         // after creating pool and adding liquidity, we have to maintain the greater than 0 reservers of both
         // tokens to continue the pool
