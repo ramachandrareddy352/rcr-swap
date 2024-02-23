@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {SafeMath} from "./libraries/SafeMath.sol";
-import {SafeCast} from "./libraries/SafeCast.sol";
+import {SafeMath} from "./SafeMath.sol";
+import {SafeCast} from "./SafeCast.sol";
 
-contract PoolLibrary {
+library PoolLibrary {
     using SafeMath for uint256;
 
-    function quote(uint256 _amountA, uint256 _reserveA, uint256 _reserveB) public pure returns (uint256 amountB) {
+    function quote(uint256 _amountA, uint256 _reserveA, uint256 _reserveB) internal pure returns (uint256 amountB) {
         require(_amountA > 0, "Pool Library: Insufficient amount");
         require(_reserveA > 0 && _reserveB > 0, "Pool Library: Insufficient reservers");
         // (amountA * reserveB) / reserveA
@@ -15,7 +15,7 @@ contract PoolLibrary {
     }
 
     function getAmountOut(int256 _amountIn, int256 _reserveIn, int256 _reserveOut, int256 _sum, int256 _tick)
-        public
+        internal
         pure
         returns (int256 amountOut)
     {
@@ -41,7 +41,7 @@ contract PoolLibrary {
     }
 
     function getAmountIn(int256 _amountOut, int256 _reserveIn, int256 _reserveOut, int256 _sum, int256 _tick)
-        public
+        internal
         pure
         returns (int256 amountIn)
     {
@@ -65,7 +65,7 @@ contract PoolLibrary {
         }
     }
 
-    function getAmountFee(uint256 _amountIn, uint256 _fee) public pure returns (uint256 amountIn) {
+    function getAmountFee(uint256 _amountIn, uint256 _fee) internal pure returns (uint256 amountIn) {
         require(_amountIn > 0, "Pool Library: Insufficient input");
         amountIn = (_amountIn.mul(_fee)).div(1000000);
     }

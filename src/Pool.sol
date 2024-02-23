@@ -7,14 +7,14 @@ import {SafeMath} from "./libraries/SafeMath.sol";
 import {LP_ERC20} from "./LP_ERC20.sol";
 import {ReentrancyGuard} from "./utils/ReentrancyGuard.sol";
 import {SafeERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
-import {PoolLibrary} from "./PoolLibrary.sol";
+import {PoolLibrary} from "./libraries/PoolLibrary.sol";
 import {SafeCast} from "./libraries/SafeCast.sol";
 
 /**
  * All the traded data is stored at ofline
  * Once pool created with tokens , we have to maintain greater than zero balance of tokens for every time
  */
-contract Pool is LP_ERC20, ReentrancyGuard, PoolLibrary {
+contract Pool is LP_ERC20, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -59,12 +59,12 @@ contract Pool is LP_ERC20, ReentrancyGuard, PoolLibrary {
         if (m_reserveA == 0 && m_reserveB == 0) {
             (amountA, amountB) = (_amountADesired, _amountBDesired);
         } else {
-            uint256 m_amountBOptimal = quote(_amountADesired, m_reserveA, m_reserveB);
+            uint256 m_amountBOptimal = PoolLibrary.quote(_amountADesired, m_reserveA, m_reserveB);
             if (m_amountBOptimal <= _amountBDesired) {
                 require(m_amountBOptimal >= _amountBMin, "POOL : Insufficient minimum token-B amount");
                 (amountA, amountB) = (_amountADesired, m_amountBOptimal);
             } else {
-                uint256 m_amountAOptimal = quote(_amountBDesired, m_reserveB, m_reserveA);
+                uint256 m_amountAOptimal = PoolLibrary.quote(_amountBDesired, m_reserveB, m_reserveA);
                 require(m_amountAOptimal <= _amountADesired, "POOL : Insufficient token-A desired");
                 require(m_amountAOptimal >= _amountAMin, "POOL : Insufficient minimum token-A amount");
                 (amountA, amountB) = (m_amountAOptimal, _amountBDesired);
@@ -181,9 +181,9 @@ contract Pool is LP_ERC20, ReentrancyGuard, PoolLibrary {
         uint256 m_reserveIn = IERC20(_tokenIn).balanceOf(address(this));
         uint256 m_reserveOut = IERC20(_tokenOut).balanceOf(address(this));
 
-        uint256 m_amountInFee = getAmountFee(_amountIn, FEE);
+        uint256 m_amountInFee = PoolLibrary.getAmountFee(_amountIn, FEE);
         uint256 m_amountInWithOutFee = _amountIn.sub(m_amountInFee);
-        int256 m_amountOut = getAmountOut(
+        int256 m_amountOut = PoolLibrary.getAmountOut(
             SafeCast.toInt256(m_amountInWithOutFee),
             SafeCast.toInt256(m_reserveIn),
             SafeCast.toInt256(m_reserveOut),
@@ -217,7 +217,7 @@ contract Pool is LP_ERC20, ReentrancyGuard, PoolLibrary {
         uint256 m_reserveIn = IERC20(_tokenIn).balanceOf(address(this));
         uint256 m_reserveOut = IERC20(_tokenOut).balanceOf(address(this));
 
-        int256 m_amountIn = getAmountIn(
+        int256 m_amountIn = PoolLibrary.getAmountIn(
             SafeCast.toInt256(_amountOut),
             SafeCast.toInt256(m_reserveIn),
             SafeCast.toInt256(m_reserveOut),
@@ -226,12 +226,12 @@ contract Pool is LP_ERC20, ReentrancyGuard, PoolLibrary {
         );
         amountIn = SafeCast.toUint256(m_amountIn);
 
-        uint256 m_amountInFee = getAmountFee(amountIn, FEE);
+        uint256 m_amountInFee = PoolLibrary.getAmountFee(amountIn, FEE);
         amountIn = amountIn.add(m_amountInFee);
 
         require(amountIn <= _amountInMax, "POOL : Excess amount in");
 
-        // SafeERC20.safeTransferFrom(IERC20(_tokenIn), msg.sender, address(this), _amountIn);
+        // SafeERC20.safeTransferFrom(IERC20(_tokenIn), msg.sender, address(this), amountIn);
         // SafeERC20.safeTransfer(IERC20(_tokenOut), _to, _amountOut);
 
         require(IERC20(_tokenOut).balanceOf(address(this)) > 0, "POOL : Out of range swap");
@@ -245,11 +245,11 @@ contract Pool is LP_ERC20, ReentrancyGuard, PoolLibrary {
         _mint(_to, _liquidity);
     }
 
-    function getReseveA() public view returns (uint) {
-        return getReserveA();
+    function getReserveA() public view returns (uint) {
+        return IERC20(TOKENA).balanceOf(address(this));
     }
 
-    function getReseveB() public view returns (uint) {
-        return getReserveB();
+    function getReserveB() public view returns (uint) {
+        return IERC20(TOKENB).balanceOf(address(this));
     }
 }
