@@ -15,7 +15,7 @@ contract LP_ERC20 {
     uint256 public totalSupply;
     string public constant name = "RCR-SWAP";
     string public constant symbol = "RCR";
-    uint256 public constant decimals = 18;
+    uint256 public constant decimals = 18; 
 
     function transfer(address to, uint256 value) public returns (bool) {
         _transfer(msg.sender, to, value);
@@ -39,6 +39,7 @@ contract LP_ERC20 {
     }
 
     function _update(address from, address to, uint256 value) internal {
+        require(value > 0, "LP_ERC20 : Zero amount");
         if (from == address(0)) {
             totalSupply = totalSupply.add(value);
         } else {
