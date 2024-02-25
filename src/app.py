@@ -7,7 +7,7 @@ for i in range(10):
         with open('file.txt', 'a') as file:
             file.write(d)
         os.system('git add .')
-        os.system('git commit -m "commit"')
+        os.system('git commit --date="' + d + '" -m "commit"')
 
 os.system('git push -u origin master')
     
