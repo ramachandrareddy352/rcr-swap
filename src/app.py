@@ -9,5 +9,5 @@ for i in range(10):
         os.system('git add .')
         os.system('git commit --date="' + d + '" -m "commit"')
 
-os.system('git push -u origin master')
+os.system('git push -u origin main')
     
