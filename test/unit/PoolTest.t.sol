@@ -188,7 +188,7 @@ contract StablePoolTest is Test {
         vm.stopPrank();
     }
 
-    function test_swapTokensExactInput() external {
+    function test_swapTokensExactInput_DaiToUsdc() external {
         // owner added liquidity
         // currently pool has 100 dai and 100 usdc
         test_addLiquidity();
@@ -203,8 +203,84 @@ contract StablePoolTest is Test {
 
         DAI.approve(address(pool), 100 * 10 ** 18);
 
-        // enter dai 50 tokens, take usdc 50 tokens
-        // 83112371912.178636
+        pool.swapTokensExactInput(5 * 10 ** 18, 0, address(DAI), address(USDC), trader, block.timestamp + 1);
+        vm.stopPrank();
+    }
+
+    function test_swapTokensExactInput_UsdcToDai() external {
+        // owner added liquidity
+        // currently pool has 100 dai and 100 usdc
+        test_addLiquidity();
+
+        console.log(pool.getReserveA());
+        console.log(pool.getReserveB());
+
+        address trader = address(2);
+        vm.startPrank(trader);
+        // both 100 tokens are minted to trader
+        _mintTokens(trader, 100);
+
+        USDC.approve(address(pool), 100 * 10 ** 18);
+
+        pool.swapTokensExactInput(5 * 10 ** 6, 0, address(USDC), address(DAI), trader, block.timestamp + 1);
+        vm.stopPrank();
+
+    }
+
+    function test_swapTokensExactOutput_DaiToUsdc() external {
+        // owner added liquidity
+        // currently pool has 100 dai and 100 usdc
+        test_addLiquidity();
+
+        console.log(pool.getReserveA());
+        console.log(pool.getReserveB());
+
+        address trader = address(2);
+        vm.startPrank(trader);
+        // both 100 tokens are minted to trader
+        _mintTokens(trader, 100);
+
+        DAI.approve(address(pool), 100 * 10 ** 18);
+
+        pool.swapTokensExactOutput(5 * 10 ** 6, type(uint256).max, address(DAI), address(USDC), trader, block.timestamp + 1);
+        vm.stopPrank();
+    }
+
+    function test_swapTokensExactOutput_UsdcToDai() external {
+        // owner added liquidity
+        // currently pool has 100 dai and 100 usdc
+        test_addLiquidity();
+
+        console.log(pool.getReserveA());
+        console.log(pool.getReserveB());
+
+        address trader = address(2);
+        vm.startPrank(trader);
+        // both 100 tokens are minted to trader
+        _mintTokens(trader, 100);
+
+        USDC.approve(address(pool), 100 * 10 ** 6);
+
+        pool.swapTokensExactOutput(5 * 10 ** 18, type(uint256).max, address(USDC), address(DAI), trader, block.timestamp + 1);
+        vm.stopPrank();
+    }
+
+    function test_fails_swapTokensExactInput_DaiToUsdc() external {
+        // owner added liquidity
+        // currently pool has 100 dai and 100 usdc
+        test_addLiquidity();
+
+        console.log(pool.getReserveA());
+        console.log(pool.getReserveB());
+
+        address trader = address(2);
+        vm.startPrank(trader);
+        // both 100 tokens are minted to trader
+        _mintTokens(trader, 100);
+
+        DAI.approve(address(pool), 100 * 10 ** 18);
+
+        vm.expectRevert("POOL : Out of range swap");
         pool.swapTokensExactInput(50 * 10 ** 18, 0, address(DAI), address(USDC), trader, block.timestamp + 1);
         vm.stopPrank();
     }

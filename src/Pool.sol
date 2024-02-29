@@ -254,10 +254,11 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         );
 
         amountIn = SafeCast.toUint256(m_amountIn);
-        amountIn = PoolLibrary.convertToNative(_tokenIn, amountIn);
+        _amountOut = PoolLibrary.convertToNative(_tokenOut, _amountOut);
 
         uint256 m_amountInFee = PoolLibrary.getAmountFee(amountIn, FEE);
         amountIn = amountIn.add(m_amountInFee);
+        amountIn = PoolLibrary.convertToNative(_tokenIn, amountIn);
 
         require(amountIn <= _amountInMax, "POOL : Excess amount in");
 
