@@ -116,7 +116,7 @@ contract Factory is Ownable {
 
     function getPool(uint256 _id) external view returns (_Pool memory) {
         return s_Pools[_id];
-    } 
+    }
 
     function getTick(address _token0, address _token1) external view returns (uint256) {
         return s_getTick[_token0][_token1];

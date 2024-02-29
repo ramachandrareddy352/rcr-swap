@@ -8,7 +8,7 @@ import {LP_ERC20} from "./LP_ERC20.sol";
 import {ReentrancyGuard} from "./utils/ReentrancyGuard.sol";
 import {PoolLibrary} from "./libraries/PoolLibrary.sol";
 import {SafeCast} from "./libraries/SafeCast.sol";
- 
+
 /**
  * All the traded data is stored at ofline
  * Once pool created with tokens , we have to maintain greater than zero balance of tokens for every time
@@ -20,7 +20,7 @@ contract Pool is LP_ERC20, ReentrancyGuard {
     event RemoveLiquidity(uint256 liquidity, uint256 amountA, uint256 amountB);
     event Swap(uint256 amountIn, uint256 amountOut, uint256 amountInFee);
 
-    uint public constant MINIMUM_LIQUIDITY = 1000;
+    uint256 public constant MINIMUM_LIQUIDITY = 1000;
     bytes4 private constant TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
     bytes4 private constant TRANSFER_FROM_SELECTOR = bytes4(keccak256(bytes("transferFrom(address,address,uint256)")));
 
@@ -48,12 +48,12 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         TICK = _tick;
     }
 
-    function _safeTransfer(address token, address to, uint value) private {
+    function _safeTransfer(address token, address to, uint256 value) private {
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(TRANSFER_SELECTOR, to, value));
         require(success && (data.length == 0 || abi.decode(data, (bool))), "POOL : Transfer failed");
     }
 
-    function _safeTransferFrom(address token, address from, address to, uint value) private {
+    function _safeTransferFrom(address token, address from, address to, uint256 value) private {
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(TRANSFER_FROM_SELECTOR, from, to, value));
         require(success && (data.length == 0 || abi.decode(data, (bool))), "POOL : Transfer from failed");
     }
@@ -64,8 +64,8 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         view
         returns (uint256 amountA, uint256 amountB)
     {
-        uint256 m_reserveA = getReserveA();   // 18
-        uint256 m_reserveB = getReserveB();   // 6
+        uint256 m_reserveA = getReserveA(); // 18
+        uint256 m_reserveB = getReserveB(); // 6
 
         // initially liquidity we accept all the tokens
         if (m_reserveA == 0 && m_reserveB == 0) {
@@ -90,7 +90,7 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         uint256 m_reserveB = getReserveB();
 
         if (m_totalSupply == 0) {
-            liquidity = (SafeMath.sqrt(_amountA.mul(_amountB))).sub(MINIMUM_LIQUIDITY); 
+            liquidity = (SafeMath.sqrt(_amountA.mul(_amountB))).sub(MINIMUM_LIQUIDITY);
             // mimimum liquidity is locked
         } else {
             liquidity = SafeMath.min(
@@ -114,7 +114,7 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         zeroAddress(_to)
         zeroAddress(msg.sender)
         returns (uint256 amountA, uint256 amountB, uint256 liquidity)
-    { 
+    {
         // check the given are correct token address
         // after and before adding liquidity the price of tokens not to be change.
         // order of execution is importent
@@ -193,43 +193,34 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         uint256 m_reserveIn = IERC20(_tokenIn).balanceOf(address(this));
         uint256 m_reserveOut = IERC20(_tokenOut).balanceOf(address(this));
 
-        uint before_Price = getCurrentPrice(_tokenIn, _tokenOut);
-        (uint low_price, uint high_price) = PoolLibrary.getPriceRange();
+        uint256 before_Price = PoolLibrary.getCurrentPrice(_tokenIn, _tokenOut, address(this));
+        (uint256 low_price, uint256 high_price) = PoolLibrary.getPriceRange(before_Price, FEE, TICK);
 
         uint256 m_amountInFee = PoolLibrary.getAmountFee(_amountIn, FEE);
         uint256 m_amountInWithOutFee = _amountIn.sub(m_amountInFee);
+
+        m_amountInWithOutFee = PoolLibrary.convertTo18Decimals(_tokenIn, m_amountInWithOutFee);
+        m_reserveIn = PoolLibrary.convertTo18Decimals(_tokenIn, m_reserveIn);
+        m_reserveOut = PoolLibrary.convertTo18Decimals(_tokenOut, m_reserveOut);
+
         int256 m_amountOut = PoolLibrary.getAmountOut(
             SafeCast.toInt256(m_amountInWithOutFee),
             SafeCast.toInt256(m_reserveIn),
             SafeCast.toInt256(m_reserveOut),
             SafeCast.toInt256(TICK)
         );
+
         amountOut = SafeCast.toUint256(m_amountOut);
+        amountOut = PoolLibrary.convertToNative(_tokenOut, amountOut);
         require(amountOut >= _amountOutMin, "POOL : Insufficient amount out");
 
         _safeTransferFrom(_tokenIn, msg.sender, address(this), _amountIn);
         _safeTransfer(_tokenOut, _to, amountOut);
 
-        uint after_price = getCurrentPrice(_tokenIn, _tokenOut);
+        uint256 after_price = PoolLibrary.getCurrentPrice(_tokenIn, _tokenOut, address(this));
         require(after_price >= low_price && after_price <= high_price, "POOL : Out of range swap");
 
         emit Swap(_amountIn, amountOut, m_amountInFee);
-    }
-
-    function getCurrentPrice(address _tokenIn, address _tokenOut) public view returns (uint price) {
-        uint m_reserveIn = IERC20(_tokenIn).balanceOf(address(this));   // 2000
-        uint m_reserveOut = IERC20(_tokenOut).balanceOf(address(this));   // 100
-
-        // 1 tokenIn = X tokenOut, X=?
-        // let dai in pool = 2000
-        // eth in pool = 100
-        // then for 1 dai we get 0.05 eth
-        // for 1 eth we get 20 dai
-
-        uint m_reserveInDecimals = IERC20(_tokenIn).decimals();
-        uint m_reserveOutDecimals = IERC20(_tokenOut).decimals();
-
-        price = m_reserveOut.div(m_reserveIn);
     }
 
     function swapTokensExactOutput(
@@ -248,8 +239,12 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         uint256 m_reserveIn = IERC20(_tokenIn).balanceOf(address(this));
         uint256 m_reserveOut = IERC20(_tokenOut).balanceOf(address(this));
 
-        uint before_Price = getCurrentPrice(_tokenIn, _tokenOut);
-        (uint low_price, uint high_price) = PoolLibrary.getPriceRange();
+        uint256 before_Price = PoolLibrary.getCurrentPrice(_tokenIn, _tokenOut, address(this));
+        (uint256 low_price, uint256 high_price) = PoolLibrary.getPriceRange(before_Price, FEE, TICK);
+
+        _amountOut = PoolLibrary.convertTo18Decimals(_tokenOut, _amountOut);
+        m_reserveIn = PoolLibrary.convertTo18Decimals(_tokenIn, m_reserveIn);
+        m_reserveOut = PoolLibrary.convertTo18Decimals(_tokenOut, m_reserveOut);
 
         int256 m_amountIn = PoolLibrary.getAmountIn(
             SafeCast.toInt256(_amountOut),
@@ -257,8 +252,10 @@ contract Pool is LP_ERC20, ReentrancyGuard {
             SafeCast.toInt256(m_reserveOut),
             SafeCast.toInt256(TICK)
         );
+
         amountIn = SafeCast.toUint256(m_amountIn);
-        
+        amountIn = PoolLibrary.convertToNative(_tokenIn, amountIn);
+
         uint256 m_amountInFee = PoolLibrary.getAmountFee(amountIn, FEE);
         amountIn = amountIn.add(m_amountInFee);
 
@@ -267,7 +264,7 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         _safeTransferFrom(_tokenIn, msg.sender, address(this), amountIn);
         _safeTransfer(_tokenOut, _to, _amountOut);
 
-        uint after_price = getCurrentPrice(_tokenIn, _tokenOut);
+        uint256 after_price = PoolLibrary.getCurrentPrice(_tokenIn, _tokenOut, address(this));
         require(after_price >= low_price && after_price <= high_price, "POOL : Out of range swap");
 
         emit Swap(amountIn, _amountOut, m_amountInFee);
@@ -279,11 +276,11 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         _mint(_to, _liquidity);
     }
 
-    function getReserveA() public view returns (uint) {
+    function getReserveA() public view returns (uint256) {
         return IERC20(TOKENA).balanceOf(address(this));
     }
 
-    function getReserveB() public view returns (uint) {
+    function getReserveB() public view returns (uint256) {
         return IERC20(TOKENB).balanceOf(address(this));
     }
 }

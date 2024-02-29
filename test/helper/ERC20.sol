@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 contract ERC20 {
-
     event Transfer(address form, address to, uint256 value);
     event Approval(address owner, address spender, uint256 value);
 
@@ -12,9 +11,9 @@ contract ERC20 {
     uint256 public totalSupply;
     string public name;
     string public symbol;
-    uint256 public decimals; 
+    uint256 public decimals;
 
-    constructor (string memory _name, string memory _symbol, uint256 _decimals) {
+    constructor(string memory _name, string memory _symbol, uint256 _decimals) {
         name = _name;
         symbol = _symbol;
         decimals = _decimals;

@@ -7,7 +7,7 @@ contract LP_ERC20 {
     using SafeMath for uint256;
 
     event Transfer(address form, address to, uint256 value);
-    event Approval(address owner, address spender, uint256 value); 
+    event Approval(address owner, address spender, uint256 value);
 
     mapping(address account => uint256) public balanceOf;
     mapping(address account => mapping(address spender => uint256)) public allowance;
@@ -15,7 +15,7 @@ contract LP_ERC20 {
     uint256 public totalSupply;
     string public constant name = "RCR-SWAP";
     string public constant symbol = "RCR";
-    uint256 public constant decimals = 18; 
+    uint256 public constant decimals = 18;
 
     function transfer(address to, uint256 value) public returns (bool) {
         _transfer(msg.sender, to, value);
