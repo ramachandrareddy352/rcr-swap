@@ -6,7 +6,7 @@ import {SafeCast} from "./SafeCast.sol";
 
 library PoolLibrary {
     using SafeMath for uint256;
-
+ 
     function quote(uint256 _amountA, uint256 _reserveA, uint256 _reserveB) internal pure returns (uint256 amountB) {
         require(_amountA > 0, "Pool Library: Insufficient amount");
         require(_reserveA > 0 && _reserveB > 0, "Pool Library: Insufficient reservers");
@@ -14,18 +14,20 @@ library PoolLibrary {
         amountB = (_amountA.mul(_reserveB)).div(_reserveA);
     }
 
-    function getAmountOut(int256 _amountIn, int256 _reserveIn, int256 _reserveOut, int256 _sum, int256 _tick)
+    function getAmountOut(int256 _amountIn, int256 _reserveIn, int256 _reserveOut,int256 _tick)
         internal
         pure
         returns (int256 amountOut)
     {
-        require(_reserveIn > 0 && _reserveOut > 0, "Pool Library: Insufficient liquidity");
+        require(_reserveIn > 0 && _reserveOut > 0, "Pool Library: Insufficient reserves");
 
         if (_tick == 0) {
             int256 numenator = _reserveOut * _amountIn;
             int256 denominator = _reserveIn + _amountIn;
             amountOut = numenator / denominator;
         } else {
+            int256 _sum = _reserveIn + _reserveOut;
+
             int256 coef_A = 4 * _tick;
             int256 coef_B = ((4 * _tick) * (_sum - _reserveIn - _amountIn - (2 * _reserveOut))) - _sum;
             int256 const_1 = (4 * _tick * _reserveOut) * (_reserveIn + _amountIn + _reserveOut - _sum);
@@ -40,7 +42,12 @@ library PoolLibrary {
         }
     }
 
-    function getAmountIn(int256 _amountOut, int256 _reserveIn, int256 _reserveOut, int256 _sum, int256 _tick)
+    function getPriceRange() internal pure returns (uint low, uint high) {
+        low = 1;
+        high = type(uint256).max;
+    }
+
+    function getAmountIn(int256 _amountOut, int256 _reserveIn, int256 _reserveOut, int256 _tick)
         internal
         pure
         returns (int256 amountIn)
@@ -51,6 +58,8 @@ library PoolLibrary {
             int256 denominator = _reserveOut - _amountOut;
             amountIn = (numerator / denominator);
         } else {
+            int256 _sum = _reserveIn + _reserveOut;
+
             int256 coef_A = 4 * _tick;
             int256 coef_B = ((4 * _tick) * ((2 * _reserveIn) + _reserveOut - _amountOut - _sum)) + _sum;
             int256 const_1 = (4 * _tick * _reserveIn) * (_reserveOut - _amountOut - _sum + _reserveIn);

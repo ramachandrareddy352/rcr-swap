@@ -1,21 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {SafeMath} from "./libraries/SafeMath.sol";
-
-contract LP_ERC20 {
-    using SafeMath for uint256;
+contract ERC20 {
 
     event Transfer(address form, address to, uint256 value);
-    event Approval(address owner, address spender, uint256 value); 
+    event Approval(address owner, address spender, uint256 value);
 
     mapping(address account => uint256) public balanceOf;
     mapping(address account => mapping(address spender => uint256)) public allowance;
 
     uint256 public totalSupply;
-    string public constant name = "RCR-SWAP";
-    string public constant symbol = "RCR";
-    uint256 public constant decimals = 18; 
+    string public name;
+    string public symbol;
+    uint256 public decimals; 
+
+    constructor (string memory _name, string memory _symbol, uint256 _decimals) {
+        name = _name;
+        symbol = _symbol;
+        decimals = _decimals;
+    }
 
     function transfer(address to, uint256 value) public returns (bool) {
         _transfer(msg.sender, to, value);
@@ -41,34 +44,34 @@ contract LP_ERC20 {
     function _update(address from, address to, uint256 value) internal {
         require(value > 0, "LP_ERC20 : Zero amount");
         if (from == address(0)) {
-            totalSupply = totalSupply.add(value);
+            totalSupply = totalSupply + value;
         } else {
             uint256 fromBalance = balanceOf[from];
             require(fromBalance >= value, "LP_ERC20 : Invalid amount");
             unchecked {
-                balanceOf[from] = fromBalance.sub(value);
+                balanceOf[from] = fromBalance - value;
             }
         }
 
         if (to == address(0)) {
             unchecked {
-                totalSupply = totalSupply.sub(value);
+                totalSupply = totalSupply - value;
             }
         } else {
             unchecked {
-                balanceOf[to] = balanceOf[to].add(value);
+                balanceOf[to] = balanceOf[to] + value;
             }
         }
 
         emit Transfer(from, to, value);
     }
 
-    function _mint(address account, uint256 value) internal {
+    function mint(address account, uint256 value) external {
         require(account != address(0), "LP_ERC20 : Invalid zero address");
         _update(address(0), account, value);
     }
 
-    function _burn(address account, uint256 value) internal {
+    function burn(address account, uint256 value) external {
         require(account != address(0), "LP_ERC20 : Invalid zero address");
         _update(account, address(0), value);
     }
@@ -90,7 +93,7 @@ contract LP_ERC20 {
         if (currentAllowance != type(uint256).max) {
             require(currentAllowance >= value, "LP_ERC20 : Invalid amount");
             unchecked {
-                _approve(owner, spender, currentAllowance.sub(value), false);
+                _approve(owner, spender, currentAllowance - value, false);
             }
         }
     }

@@ -52,7 +52,7 @@ contract Factory is Ownable {
 
     function createPool(address _tokenA, address _tokenB, uint256 _fee) external returns (address m_pair) {
         // factory allows 0.01% to 1% of _fee amount for a pool to create
-        require(_tokenA != address(0), "Factory : Invalid zero address");
+        require(_tokenA != address(0) && _tokenB != address(0), "Factory : Invalid zero address");
         require(_tokenA != _tokenB, "Factory : Identical tokens");
         // its better to use fee%50 == 0 due to rounding of data
         // less the fee can help to maintain the price by swaping in less range of tokens
@@ -100,7 +100,7 @@ contract Factory is Ownable {
         // tick should be in range of 0-100(better positions at x+y = 1 Million * 10**18)
         // (1-3) best for one stabel and non-stabel
         // (4-20) for both stable
-        require(_tokenA != address(0) && _tokenB != address(0) && _tokenA != _tokenB, "Factory : Invalid zero address");
+        require(_tokenA != address(0) && _tokenA != _tokenB, "Factory : Invalid zero address");
         require(_tick <= MAX_TICK, "Factory : High tick position");
         s_getTick[_tokenA][_tokenB] = _tick;
         s_getTick[_tokenB][_tokenA] = _tick;
@@ -116,7 +116,7 @@ contract Factory is Ownable {
 
     function getPool(uint256 _id) external view returns (_Pool memory) {
         return s_Pools[_id];
-    }
+    } 
 
     function getTick(address _token0, address _token1) external view returns (uint256) {
         return s_getTick[_token0][_token1];

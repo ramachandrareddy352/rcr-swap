@@ -15,6 +15,7 @@ library SafeMath {
     }
 
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b > 0, "SafeMath : Cannot divide by zero");
         return a / b; // Solidity automatically throws when dividing by 0
     }
 
