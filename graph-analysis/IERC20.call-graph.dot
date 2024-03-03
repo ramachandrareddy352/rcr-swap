@@ -1,0 +1,16 @@
+strict digraph {
+subgraph cluster_2221_IERC20 {
+label = "IERC20"
+"2221_balanceOf" [label="balanceOf"]
+"2221_name" [label="name"]
+"2221_transferFrom" [label="transferFrom"]
+"2221_transfer" [label="transfer"]
+"2221_symbol" [label="symbol"]
+"2221_decimals" [label="decimals"]
+"2221_approve" [label="approve"]
+"2221_totalSupply" [label="totalSupply"]
+"2221_allowance" [label="allowance"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+}
+}

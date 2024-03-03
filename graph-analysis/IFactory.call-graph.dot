@@ -1,0 +1,21 @@
+strict digraph {
+subgraph cluster_2350_IFactory {
+label = "IFactory"
+"2350_setTicks" [label="setTicks"]
+"2350_MAX_POOL_FEE" [label="MAX_POOL_FEE"]
+"2350_getPoolData" [label="getPoolData"]
+"2350_MIN_POOL_FEE" [label="MIN_POOL_FEE"]
+"2350_owner" [label="owner"]
+"2350_getAllPoolsAddress" [label="getAllPoolsAddress"]
+"2350_MAX_TICK" [label="MAX_TICK"]
+"2350_s_poolCount" [label="s_poolCount"]
+"2350_transferOwnership" [label="transferOwnership"]
+"2350_getTick" [label="getTick"]
+"2350_getPool" [label="getPool"]
+"2350_getPair" [label="getPair"]
+"2350_createPool" [label="createPool"]
+"2350_getOwnerPools" [label="getOwnerPools"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+}
+}

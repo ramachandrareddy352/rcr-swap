@@ -1,0 +1,19 @@
+strict digraph {
+subgraph cluster_2511_IPool {
+label = "IPool"
+"2511_swapTokensExactInput" [label="swapTokensExactInput"]
+"2511_TOKENB" [label="TOKENB"]
+"2511_FEE" [label="FEE"]
+"2511_FACTORY" [label="FACTORY"]
+"2511_TOKENA" [label="TOKENA"]
+"2511__addLiquidity" [label="_addLiquidity"]
+"2511__mintLiquidity" [label="_mintLiquidity"]
+"2511__removeLiquidity" [label="_removeLiquidity"]
+"2511_removeLiquidity" [label="removeLiquidity"]
+"2511_swapTokensExactOutput" [label="swapTokensExactOutput"]
+"2511_addLiquidity" [label="addLiquidity"]
+"2511_TICK" [label="TICK"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+}
+}

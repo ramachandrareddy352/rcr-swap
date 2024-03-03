@@ -1,0 +1,28 @@
+strict digraph {
+subgraph cluster_3623_SafeMath {
+label = "SafeMath"
+"3623_div" [label="div"]
+"3623_mul" [label="mul"]
+"3623_min" [label="min"]
+"3623_max" [label="max"]
+"3623_mod" [label="mod"]
+"3623_sqrt" [label="sqrt"]
+"3623_log2" [label="log2"]
+"3623_add" [label="add"]
+"3623_sub" [label="sub"]
+"3623_log10" [label="log10"]
+"3623_toUint" [label="toUint"]
+"3623_average" [label="average"]
+"3623_log2" -> "3623_toUint"
+"3623_sqrt" -> "3623_toUint"
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"require(bool)" 
+"require(bool,string)" 
+"3623_sub" -> "require(bool)"
+"3623_div" -> "require(bool,string)"
+"3623_mul" -> "require(bool)"
+"3623_mod" -> "require(bool,string)"
+"3623_add" -> "require(bool)"
+}
+}

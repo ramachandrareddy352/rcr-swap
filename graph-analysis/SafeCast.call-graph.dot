@@ -1,0 +1,12 @@
+strict digraph {
+subgraph cluster_2860_SafeCast {
+label = "SafeCast"
+"2860_toInt256" [label="toInt256"]
+"2860_toUint256" [label="toUint256"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"require(bool,string)" 
+"2860_toInt256" -> "require(bool,string)"
+"2860_toUint256" -> "require(bool,string)"
+}
+}

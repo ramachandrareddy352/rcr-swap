@@ -1,0 +1,17 @@
+strict digraph {
+subgraph cluster_2787_PoolLibrary {
+label = "PoolLibrary"
+"2787_getAmountIn" [label="getAmountIn"]
+"2787_getAmountFee" [label="getAmountFee"]
+"2787_quote" [label="quote"]
+"2787_getCurrentPrice" [label="getCurrentPrice"]
+"2787_getPriceRange" [label="getPriceRange"]
+"2787_getAmountOut" [label="getAmountOut"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"require(bool,string)" 
+"2787_getAmountIn" -> "require(bool,string)"
+"2787_getAmountOut" -> "require(bool,string)"
+"2787_quote" -> "require(bool,string)"
+}
+}

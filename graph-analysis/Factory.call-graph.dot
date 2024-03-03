@@ -1,0 +1,41 @@
+strict digraph {
+subgraph cluster_551_Factory {
+label = "Factory"
+"551_createPool" [label="createPool"]
+"551_getPoolData" [label="getPoolData"]
+"551__setTick" [label="_setTick"]
+"551_constructor" [label="constructor"]
+"551_getTick" [label="getTick"]
+"551_getPair" [label="getPair"]
+"551_getOwnerPools" [label="getOwnerPools"]
+"551_getPool" [label="getPool"]
+"551_getAllPoolsAddress" [label="getAllPoolsAddress"]
+"551_slitherConstructorConstantVariables" [label="slitherConstructorConstantVariables"]
+"551_setTicks" [label="setTicks"]
+"551_setTicks" -> "551__setTick"
+"551_constructor" -> "551_constructor"
+"551_constructor" -> "551__setTick"
+"551_setTicks" -> "551_onlyOwner"
+}subgraph cluster_3719_Ownable {
+label = "Ownable"
+"3719_owner" [label="owner"]
+"3719__checkOwner" [label="_checkOwner"]
+"3719_constructor" [label="constructor"]
+"3719_transferOwnership" [label="transferOwnership"]
+"3719__transferOwnership" [label="_transferOwnership"]
+"3719__checkOwner" -> "3719_owner"
+"3719_transferOwnership" -> "3719_onlyOwner"
+"3719_constructor" -> "3719__transferOwnership"
+"3719_transferOwnership" -> "3719__transferOwnership"
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"require(bool,string)" 
+"3719_transferOwnership" -> "require(bool,string)"
+"551_createPool" -> "require(bool,string)"
+"551_constructor" -> "require(bool,string)"
+"551__setTick" -> "require(bool,string)"
+"3719_constructor" -> "require(bool,string)"
+"551_setTicks" -> "require(bool,string)"
+"3719__checkOwner" -> "require(bool,string)"
+}
+}
