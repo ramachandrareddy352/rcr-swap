@@ -7,3 +7,8 @@ out = "out"
 src = "src"
 viaIR = true
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+
+[invariant]
+depth = 32
+fail_on_revert = true
+runs = 256

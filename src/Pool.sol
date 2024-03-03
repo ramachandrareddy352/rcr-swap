@@ -16,9 +16,11 @@ import {SafeCast} from "./libraries/SafeCast.sol";
 contract Pool is LP_ERC20, ReentrancyGuard {
     using SafeMath for uint256;
 
-    event AddLiquidity(uint256 amountA, uint256 amountB, uint256 liquidity);
-    event RemoveLiquidity(uint256 liquidity, uint256 amountA, uint256 amountB);
-    event Swap(uint256 amountIn, uint256 amountOut, uint256 amountInFee);
+    event AddLiquidity(address indexed from, address indexed to, uint256 amountA, uint256 amountB, uint256 liquidity);
+    event RemoveLiquidity(
+        address indexed from, address indexed to, uint256 liquidity, uint256 amountA, uint256 amountB
+    );
+    event Swap(address indexed from, address indexed to, uint256 amountIn, uint256 amountOut, uint256 amountInFee);
 
     uint256 public constant MINIMUM_LIQUIDITY = 1000;
     bytes4 private constant TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
@@ -59,43 +61,44 @@ contract Pool is LP_ERC20, ReentrancyGuard {
     }
 
     /* ------- ADD LIQUIDITY ------- */
-    function _addLiquidity(uint256 _amountADesired, uint256 _amountBDesired, uint256 _amountAMin, uint256 _amountBMin)
-        public
-        view
-        returns (uint256 amountA, uint256 amountB)
-    {
-        uint256 m_reserveA = getReserveA(); // 18
-        uint256 m_reserveB = getReserveB(); // 6
-
-        // initially liquidity we accept all the tokens
-        if (m_reserveA == 0 && m_reserveB == 0) {
+    function _addLiquidity(
+        uint256 _amountADesired,
+        uint256 _amountBDesired,
+        uint256 _amountAMin,
+        uint256 _amountBMin,
+        uint256 _reserveA,
+        uint256 _reserveB
+    ) public pure returns (uint256 amountA, uint256 amountB) {
+        // at initially liquidity we accept all the tokens
+        if (_reserveA == 0 && _reserveB == 0) {
             (amountA, amountB) = (_amountADesired, _amountBDesired);
         } else {
-            uint256 m_amountBOptimal = PoolLibrary.quote(_amountADesired, m_reserveA, m_reserveB);
+            uint256 m_amountBOptimal = PoolLibrary.quote(_amountADesired, _reserveA, _reserveB);
             if (m_amountBOptimal <= _amountBDesired) {
-                require(m_amountBOptimal >= _amountBMin, "POOL : Insufficient minimum token-B amount");
+                require(m_amountBOptimal >= _amountBMin, "POOL : Optimal amount-B exceed");
                 (amountA, amountB) = (_amountADesired, m_amountBOptimal);
             } else {
-                uint256 m_amountAOptimal = PoolLibrary.quote(_amountBDesired, m_reserveB, m_reserveA);
-                require(m_amountAOptimal <= _amountADesired, "POOL : Insufficient token-A desired");
-                require(m_amountAOptimal >= _amountAMin, "POOL : Insufficient minimum token-A amount");
+                uint256 m_amountAOptimal = PoolLibrary.quote(_amountBDesired, _reserveB, _reserveA);
+                require(m_amountAOptimal <= _amountADesired, "POOL : Insufficient liquidity added");
+                require(m_amountAOptimal >= _amountAMin, "POOL : Optimal amount-A exceed");
                 (amountA, amountB) = (m_amountAOptimal, _amountBDesired);
             }
         }
     }
 
-    function _mintLiquidity(uint256 _amountA, uint256 _amountB) public view returns (uint256 liquidity) {
+    function _mintLiquidity(uint256 _amountA, uint256 _amountB, uint256 _reserveA, uint256 _reserveB)
+        public
+        view
+        returns (uint256 liquidity)
+    {
         uint256 m_totalSupply = totalSupply;
-        uint256 m_reserveA = getReserveA();
-        uint256 m_reserveB = getReserveB();
 
         if (m_totalSupply == 0) {
             liquidity = (SafeMath.sqrt(_amountA.mul(_amountB))).sub(MINIMUM_LIQUIDITY);
-            // mimimum liquidity is locked
+            // mimimum liquidity is locked perminently
         } else {
-            liquidity = SafeMath.min(
-                (_amountA.mul(m_totalSupply)).div(m_reserveA), (_amountB.mul(m_totalSupply)).div(m_reserveB)
-            );
+            liquidity =
+                SafeMath.min((_amountA.mul(m_totalSupply)).div(_reserveA), (_amountB.mul(m_totalSupply)).div(_reserveB));
         }
         require(liquidity > 0, "POOL : Invalid mint liquidity");
     }
@@ -115,31 +118,33 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         zeroAddress(msg.sender)
         returns (uint256 amountA, uint256 amountB, uint256 liquidity)
     {
-        // check the given are correct token address
-        // after and before adding liquidity the price of tokens not to be change.
-        // order of execution is importent
-        require(_amountADesired > 0 && _amountBDesired > 0, "POOL : Zero amount desired");
+        uint256 m_reserveA = IERC20(TOKENA).balanceOf(address(this));
+        uint256 m_reserveB = IERC20(TOKENB).balanceOf(address(this));
+        address sender = msg.sender; // @gas-optimization
 
-        (amountA, amountB) = _addLiquidity(_amountADesired, _amountBDesired, _amountAMin, _amountBMin);
-        liquidity = _mintLiquidity(amountA, amountB);
+        (amountA, amountB) =
+            _addLiquidity(_amountADesired, _amountBDesired, _amountAMin, _amountBMin, m_reserveA, m_reserveB);
+        liquidity = _mintLiquidity(amountA, amountB, m_reserveA, m_reserveB);
 
-        _safeTransferFrom(TOKENA, msg.sender, address(this), amountA);
-        _safeTransferFrom(TOKENB, msg.sender, address(this), amountB);
+        _safeTransferFrom(TOKENA, sender, address(this), amountA);
+        _safeTransferFrom(TOKENB, sender, address(this), amountB);
 
         _mint(_to, liquidity);
 
-        emit AddLiquidity(amountA, amountB, liquidity);
+        emit AddLiquidity(sender, _to, amountA, amountB, liquidity);
     }
 
     /* ------- REMOVE LIQUIDITY ------- */
-
-    function _removeLiquidity(uint256 _liquidity, uint256 _amountAMin, uint256 _amountBMin)
-        public
-        view
-        returns (uint256 amountA, uint256 amountB)
-    {
-        uint256 m_reserveA = getReserveA();
-        uint256 m_reserveB = getReserveB();
+    function _removeLiquidity(
+        uint256 _liquidity,
+        uint256 _amountAMin,
+        uint256 _amountBMin,
+        address _tokenA,
+        address _tokenB,
+        address _pool
+    ) public view returns (uint256 amountA, uint256 amountB) {
+        uint256 m_reserveA = IERC20(_tokenA).balanceOf(_pool);
+        uint256 m_reserveB = IERC20(_tokenB).balanceOf(_pool);
         uint256 m_totalSupply = totalSupply;
 
         amountA = (m_reserveA.mul(_liquidity)).div(m_totalSupply);
@@ -154,29 +159,31 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         uint256 _amountBMin,
         address _to,
         uint256 _deadline
-    ) external nonReentrant ensure(_deadline) zeroAddress(_to) returns (uint256 amountA, uint256 amountB) {
-        // require(_liquidity <= balanceOf[msg.sender], "POOL : Insufficient liquidity");
+    )
+        external
+        nonReentrant
+        ensure(_deadline)
+        zeroAddress(msg.sender)
+        zeroAddress(_to)
+        returns (uint256 amountA, uint256 amountB)
+    {
         // checked at ERC20 contract   &    order of execution is importent
-        (amountA, amountB) = _removeLiquidity(_liquidity, _amountAMin, _amountBMin);
+        (address m_tokenA, address m_tokenB, address m_pool) = (TOKENA, TOKENB, address(this)); // @gas-optimization
+
+        (amountA, amountB) = _removeLiquidity(_liquidity, _amountAMin, _amountBMin, m_tokenA, m_tokenB, m_pool);
+
         _burn(msg.sender, _liquidity);
+        _safeTransfer(m_tokenA, _to, amountA);
+        _safeTransfer(m_tokenB, _to, amountB);
 
-        _safeTransfer(TOKENA, _to, amountA);
-        _safeTransfer(TOKENB, _to, amountB);
+        // maintain minimum balance from hacking of pool
+        require(IERC20(m_tokenA).balanceOf(m_pool) > 0, "POOL : Insufficient liquidity-A removed");
+        require(IERC20(m_tokenB).balanceOf(m_pool) > 0, "POOL : Insufficient liquidity-B removed");
 
-        // after creating pool and adding liquidity, we have to maintain the greater than 0 reservers of both
-        // tokens to continue the pool
-        require(getReserveA() > 0, "POOL : Insufficient liquidity removed");
-        require(getReserveB() > 0, "POOL : Insufficient liquidity removed");
-
-        emit RemoveLiquidity(_liquidity, amountA, amountB);
+        emit RemoveLiquidity(msg.sender, _to, _liquidity, amountA, amountB);
     }
 
     /* ------- SWAP TOKENS ------- */
-    /**
-     * we calculate the liquidity before swap and find the range of liquidity, between this range only
-     * the swap has to done.
-     * The range is finded using before swaping of liquidity, reservers, fee, tick.
-     */
     function swapTokensExactInput(
         uint256 _amountIn,
         uint256 _amountOutMin,
@@ -184,44 +191,45 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         address _tokenOut,
         address _to,
         uint256 _deadline
-    ) external nonReentrant ensure(_deadline) zeroAddress(_to) zeroAddress(msg.sender) returns (uint256 amountOut) {
+    )
+        external
+        nonReentrant
+        ensure(_deadline)
+        zeroAddress(_to)
+        zeroAddress(msg.sender)
+        returns (uint256 amountOut, uint256 fee)
+    {
         require(
             (_tokenIn == TOKENA && _tokenOut == TOKENB) || (_tokenIn == TOKENB && _tokenOut == TOKENA),
-            "POOL : Invalid tokens"
+            "POOL : Invalid pool tokens"
         );
-        // amountIn checks at pool library
+
         uint256 m_reserveIn = IERC20(_tokenIn).balanceOf(address(this));
         uint256 m_reserveOut = IERC20(_tokenOut).balanceOf(address(this));
+        uint256 m_reserveInDecimals = IERC20(_tokenIn).decimals();
 
-        uint256 before_Price = PoolLibrary.getCurrentPrice(_tokenIn, _tokenOut, address(this));
+        require(_amountIn > 0 && m_reserveIn > 0 && m_reserveOut > 0, "POOL : zero amount");
+
+        uint256 before_Price = PoolLibrary.getCurrentPrice(m_reserveIn, m_reserveOut, m_reserveInDecimals);
         (uint256 low_price, uint256 high_price) = PoolLibrary.getPriceRange(before_Price, FEE, TICK);
+        fee = PoolLibrary.getAmountFee(_amountIn, FEE);
 
-        uint256 m_amountInFee = PoolLibrary.getAmountFee(_amountIn, FEE);
-        uint256 m_amountInWithOutFee = _amountIn.sub(m_amountInFee);
+        amountOut = PoolLibrary.getAmountOut(_amountIn.sub(fee), m_reserveIn, m_reserveOut);
 
-        m_amountInWithOutFee = PoolLibrary.convertTo18Decimals(_tokenIn, m_amountInWithOutFee);
-        m_reserveIn = PoolLibrary.convertTo18Decimals(_tokenIn, m_reserveIn);
-        m_reserveOut = PoolLibrary.convertTo18Decimals(_tokenOut, m_reserveOut);
-
-        int256 m_amountOut = PoolLibrary.getAmountOut(
-            SafeCast.toInt256(m_amountInWithOutFee),
-            SafeCast.toInt256(m_reserveIn),
-            SafeCast.toInt256(m_reserveOut),
-            SafeCast.toInt256(TICK)
-        );
-
-        amountOut = SafeCast.toUint256(m_amountOut);
-        amountOut = PoolLibrary.convertToNative(_tokenOut, amountOut);
         require(amountOut >= _amountOutMin, "POOL : Insufficient amount out");
 
         _safeTransferFrom(_tokenIn, msg.sender, address(this), _amountIn);
         _safeTransfer(_tokenOut, _to, amountOut);
 
-        uint256 after_price = PoolLibrary.getCurrentPrice(_tokenIn, _tokenOut, address(this));
+        uint256 m_reserveIn_ = IERC20(_tokenIn).balanceOf(address(this));
+        uint256 m_reserveOut_ = IERC20(_tokenOut).balanceOf(address(this));
+
+        uint256 after_price = PoolLibrary.getCurrentPrice(m_reserveIn_, m_reserveOut_, m_reserveInDecimals);
         require(after_price >= low_price && after_price <= high_price, "POOL : Out of range swap");
 
-        emit Swap(_amountIn, amountOut, m_amountInFee);
+        emit Swap(msg.sender, _to, _amountIn, amountOut, fee);
     }
+    // stable pool is dangerous it does not depend on reserve, it always swap for stable values
 
     function swapTokensExactOutput(
         uint256 _amountOut,
@@ -230,7 +238,14 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         address _tokenOut,
         address _to,
         uint256 _deadline
-    ) external nonReentrant ensure(_deadline) zeroAddress(_to) zeroAddress(msg.sender) returns (uint256 amountIn) {
+    )
+        external
+        nonReentrant
+        ensure(_deadline)
+        zeroAddress(_to)
+        zeroAddress(msg.sender)
+        returns (uint256 amountIn, uint256 fee)
+    {
         require(
             (_tokenIn == TOKENA && _tokenOut == TOKENB) || (_tokenIn == TOKENB && _tokenOut == TOKENA),
             "POOL : Invalid tokens"
@@ -238,50 +253,35 @@ contract Pool is LP_ERC20, ReentrancyGuard {
         // amountIn checks at pool library
         uint256 m_reserveIn = IERC20(_tokenIn).balanceOf(address(this));
         uint256 m_reserveOut = IERC20(_tokenOut).balanceOf(address(this));
+        uint256 m_reserveInDecimals = IERC20(_tokenIn).decimals();
 
-        uint256 before_Price = PoolLibrary.getCurrentPrice(_tokenIn, _tokenOut, address(this));
+        require(_amountOut > 0 && m_reserveIn > 0 && m_reserveOut > 0, "POOL : zero amount");
+
+        uint256 before_Price = PoolLibrary.getCurrentPrice(m_reserveIn, m_reserveOut, m_reserveInDecimals);
         (uint256 low_price, uint256 high_price) = PoolLibrary.getPriceRange(before_Price, FEE, TICK);
 
-        _amountOut = PoolLibrary.convertTo18Decimals(_tokenOut, _amountOut);
-        m_reserveIn = PoolLibrary.convertTo18Decimals(_tokenIn, m_reserveIn);
-        m_reserveOut = PoolLibrary.convertTo18Decimals(_tokenOut, m_reserveOut);
+        amountIn = PoolLibrary.getAmountIn(_amountOut, m_reserveIn, m_reserveOut);
 
-        int256 m_amountIn = PoolLibrary.getAmountIn(
-            SafeCast.toInt256(_amountOut),
-            SafeCast.toInt256(m_reserveIn),
-            SafeCast.toInt256(m_reserveOut),
-            SafeCast.toInt256(TICK)
-        );
-
-        amountIn = SafeCast.toUint256(m_amountIn);
-        _amountOut = PoolLibrary.convertToNative(_tokenOut, _amountOut);
-
-        uint256 m_amountInFee = PoolLibrary.getAmountFee(amountIn, FEE);
-        amountIn = amountIn.add(m_amountInFee);
-        amountIn = PoolLibrary.convertToNative(_tokenIn, amountIn);
+        fee = PoolLibrary.getAmountFee(amountIn, FEE);
+        amountIn = amountIn.add(fee);
 
         require(amountIn <= _amountInMax, "POOL : Excess amount in");
 
         _safeTransferFrom(_tokenIn, msg.sender, address(this), amountIn);
         _safeTransfer(_tokenOut, _to, _amountOut);
 
-        uint256 after_price = PoolLibrary.getCurrentPrice(_tokenIn, _tokenOut, address(this));
+        uint256 m_reserveIn_ = IERC20(_tokenIn).balanceOf(address(this));
+        uint256 m_reserveOut_ = IERC20(_tokenOut).balanceOf(address(this));
+
+        uint256 after_price = PoolLibrary.getCurrentPrice(m_reserveIn_, m_reserveOut_, m_reserveInDecimals);
         require(after_price >= low_price && after_price <= high_price, "POOL : Out of range swap");
 
-        emit Swap(amountIn, _amountOut, m_amountInFee);
+        emit Swap(msg.sender, _to, amountIn, _amountOut, fee);
     }
 
     // this function is called when any liquidity issues came
     function mintLiquidity(address _to, uint256 _liquidity) external {
         require(msg.sender == IFactory(FACTORY).owner(), "POOL : Invalid factory owner");
         _mint(_to, _liquidity);
-    }
-
-    function getReserveA() public view returns (uint256) {
-        return IERC20(TOKENA).balanceOf(address(this));
-    }
-
-    function getReserveB() public view returns (uint256) {
-        return IERC20(TOKENB).balanceOf(address(this));
     }
 }

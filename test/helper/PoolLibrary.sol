@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {SafeMath} from "./SafeMath.sol";
-import {SafeCast} from "./SafeCast.sol";
-import {IERC20} from "../interfaces/IERC20.sol";
+import {SafeMath} from "../../src/libraries/SafeMath.sol";
+import {SafeCast} from "../../src/libraries/SafeCast.sol";
+import {IERC20} from "../../src/interfaces/IERC20.sol";
 
-library PoolLibrary {
+contract PoolLibrary {
     using SafeMath for uint256;
 
     function quote(uint256 _amountA, uint256 _reserveA, uint256 _reserveB) public pure returns (uint256 amountB) {

@@ -22,7 +22,7 @@ contract Factory is Ownable {
     // for same pair of tokens we can create 198 different pools
     uint256 public constant MAX_POOL_FEE = 10000; // 1%
     uint256 public constant MIN_POOL_FEE = 100; // 0.01%
-    uint256 public constant MAX_TICK = 100;
+    uint256 public constant MAX_TICK = 10000; // more tick more swap range
 
     struct _Pool {
         address tokenA;
@@ -102,6 +102,7 @@ contract Factory is Ownable {
         // (4-20) for both stable
         require(_tokenA != address(0) && _tokenA != _tokenB, "Factory : Invalid zero address");
         require(_tick <= MAX_TICK, "Factory : High tick position");
+        require(s_getTick[_tokenA][_tokenB] == 0, "Factory : Tick already exist");
         s_getTick[_tokenA][_tokenB] = _tick;
         s_getTick[_tokenB][_tokenA] = _tick;
     }

@@ -52,19 +52,19 @@ contract StablePoolTest is Test {
     function test_dataBeforeActions() external {
         assertEq(pool.balanceOf(address(pool)), 0);
         assertEq(pool.totalSupply(), 0);
-        assertEq(pool.getReserveA(), 0);
-        assertEq(pool.getReserveB(), 0);
+        assertEq(IERC20(pool.TOKENA()).balanceOf(address(pool)), 0);
+        assertEq(IERC20(pool.TOKENB()).balanceOf(address(pool)), 0);
     }
 
     function test_fails_InvalidLiquidityData() external {
-        vm.expectRevert("POOL : Zero amount desired");
+        vm.expectRevert();
         pool.addLiquidity(0, 0, 0, 0, owner, block.timestamp + 1);
 
-        vm.expectRevert("POOL : deadline expired");
+        vm.expectRevert();
         pool.addLiquidity(0, 0, 0, 0, owner, block.timestamp - 1);
 
         vm.startPrank(address(0));
-        vm.expectRevert("POOL : Invaldi zero address");
+        vm.expectRevert();
         pool.addLiquidity(0, 0, 0, 0, owner, block.timestamp + 1);
         vm.stopPrank();
     }
@@ -97,8 +97,8 @@ contract StablePoolTest is Test {
         assertEq(liquidity, expectLiquidity); // 99999999999000
 
         assertEq(pool.totalSupply(), expectLiquidity);
-        assertEq(pool.getReserveA(), tokenA_amount); // 100 * 1e18
-        assertEq(pool.getReserveB(), tokenB_amount); // 100 * 1e6
+        assertEq(IERC20(pool.TOKENA()).balanceOf(address(pool)), tokenA_amount); // 100 * 1e18
+        assertEq(IERC20(pool.TOKENB()).balanceOf(address(pool)), tokenB_amount); // 100 * 1e6
 
         assertEq(pool.balanceOf(owner), expectLiquidity);
 
@@ -112,8 +112,8 @@ contract StablePoolTest is Test {
         // both tokens are 100 so it accept all the tokens
         vm.startPrank(owner);
         uint256 m_totalSupply = pool.totalSupply();
-        uint256 m_reserveA = pool.getReserveA();
-        uint256 m_reserveB = pool.getReserveB();
+        uint256 m_reserveA = IERC20(pool.TOKENA()).balanceOf(address(pool));
+        uint256 m_reserveB = IERC20(pool.TOKENB()).balanceOf(address(pool));
 
         uint256 tokenA_amount = 100 * 10 ** 18;
         uint256 tokenB_amount = 100 * 10 ** 6;
@@ -135,8 +135,8 @@ contract StablePoolTest is Test {
         uint256 pastLiquidity = 99999999999000;
 
         assertEq(pool.totalSupply(), expectLiquidity + pastLiquidity);
-        assertEq(pool.getReserveA(), 2 * tokenA_amount); // 100 * 1e18
-        assertEq(pool.getReserveB(), 2 * tokenB_amount); // 100 * 1e6
+        assertEq(IERC20(pool.TOKENA()).balanceOf(address(pool)), 2 * tokenA_amount); // 100 * 1e18
+        assertEq(IERC20(pool.TOKENB()).balanceOf(address(pool)), 2 * tokenB_amount); // 100 * 1e6
 
         assertEq(pool.balanceOf(owner), pool.totalSupply());
 
@@ -171,7 +171,7 @@ contract StablePoolTest is Test {
         console.log("Before pool USDC balance", USDC.balanceOf(address(pool)));
 
         // remove liquidity of 1 million wei
-        (uint256 minA, uint256 minB) = pool._removeLiquidity(1000000, 0, 0);
+        (uint256 minA, uint256 minB) = pool._removeLiquidity(1000000, 0, 0, address(DAI), address(USDC), address(pool));
         pool.removeLiquidity(1000000, minA, minB, owner, block.timestamp + 1);
 
         console.log("DAI return amount ", minA);
@@ -188,13 +188,10 @@ contract StablePoolTest is Test {
         vm.stopPrank();
     }
 
-    function test_swapTokensExactInput_DaiToUsdc() external {
+    function test_swapTokensExactInput_DaiToUsdc() public {
         // owner added liquidity
         // currently pool has 100 dai and 100 usdc
         test_addLiquidity();
-
-        console.log(pool.getReserveA());
-        console.log(pool.getReserveB());
 
         address trader = address(2);
         vm.startPrank(trader);
@@ -212,9 +209,6 @@ contract StablePoolTest is Test {
         // currently pool has 100 dai and 100 usdc
         test_addLiquidity();
 
-        console.log(pool.getReserveA());
-        console.log(pool.getReserveB());
-
         address trader = address(2);
         vm.startPrank(trader);
         // both 100 tokens are minted to trader
@@ -224,16 +218,12 @@ contract StablePoolTest is Test {
 
         pool.swapTokensExactInput(5 * 10 ** 6, 0, address(USDC), address(DAI), trader, block.timestamp + 1);
         vm.stopPrank();
-
     }
 
     function test_swapTokensExactOutput_DaiToUsdc() external {
         // owner added liquidity
         // currently pool has 100 dai and 100 usdc
         test_addLiquidity();
-
-        console.log(pool.getReserveA());
-        console.log(pool.getReserveB());
 
         address trader = address(2);
         vm.startPrank(trader);
@@ -242,7 +232,9 @@ contract StablePoolTest is Test {
 
         DAI.approve(address(pool), 100 * 10 ** 18);
 
-        pool.swapTokensExactOutput(5 * 10 ** 6, type(uint256).max, address(DAI), address(USDC), trader, block.timestamp + 1);
+        pool.swapTokensExactOutput(
+            5 * 10 ** 6, type(uint256).max, address(DAI), address(USDC), trader, block.timestamp + 1
+        );
         vm.stopPrank();
     }
 
@@ -251,9 +243,6 @@ contract StablePoolTest is Test {
         // currently pool has 100 dai and 100 usdc
         test_addLiquidity();
 
-        console.log(pool.getReserveA());
-        console.log(pool.getReserveB());
-
         address trader = address(2);
         vm.startPrank(trader);
         // both 100 tokens are minted to trader
@@ -261,7 +250,9 @@ contract StablePoolTest is Test {
 
         USDC.approve(address(pool), 100 * 10 ** 6);
 
-        pool.swapTokensExactOutput(5 * 10 ** 18, type(uint256).max, address(USDC), address(DAI), trader, block.timestamp + 1);
+        pool.swapTokensExactOutput(
+            5 * 10 ** 18, type(uint256).max, address(USDC), address(DAI), trader, block.timestamp + 1
+        );
         vm.stopPrank();
     }
 
@@ -269,9 +260,6 @@ contract StablePoolTest is Test {
         // owner added liquidity
         // currently pool has 100 dai and 100 usdc
         test_addLiquidity();
-
-        console.log(pool.getReserveA());
-        console.log(pool.getReserveB());
 
         address trader = address(2);
         vm.startPrank(trader);

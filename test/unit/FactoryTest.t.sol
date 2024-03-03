@@ -172,7 +172,7 @@ contract FactoryTest is Test {
     function test_constants() external {
         assertEq(factory.MAX_POOL_FEE(), 10000);
         assertEq(factory.MIN_POOL_FEE(), 100);
-        assertEq(factory.MAX_TICK(), 100);
+        assertEq(factory.MAX_TICK(), 10000);
     }
 
     function test_transferOwner() external {
