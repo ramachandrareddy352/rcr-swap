@@ -1,0 +1,249 @@
+strict digraph {
+subgraph cluster_2787_PoolLibrary {
+label = "PoolLibrary"
+"2787_getAmountIn" [label="getAmountIn"]
+"2787_getAmountFee" [label="getAmountFee"]
+"2787_quote" [label="quote"]
+"2787_getCurrentPrice" [label="getCurrentPrice"]
+"2787_getPriceRange" [label="getPriceRange"]
+"2787_getAmountOut" [label="getAmountOut"]
+}subgraph cluster_3719_Ownable {
+label = "Ownable"
+"3719_owner" [label="owner"]
+"3719__checkOwner" [label="_checkOwner"]
+"3719_constructor" [label="constructor"]
+"3719_transferOwnership" [label="transferOwnership"]
+"3719__transferOwnership" [label="_transferOwnership"]
+"3719__checkOwner" -> "3719_owner"
+"3719_transferOwnership" -> "3719_onlyOwner"
+"3719_constructor" -> "3719__transferOwnership"
+"3719_transferOwnership" -> "3719__transferOwnership"
+}subgraph cluster_3623_SafeMath {
+label = "SafeMath"
+"3623_div" [label="div"]
+"3623_mul" [label="mul"]
+"3623_min" [label="min"]
+"3623_max" [label="max"]
+"3623_mod" [label="mod"]
+"3623_sqrt" [label="sqrt"]
+"3623_log2" [label="log2"]
+"3623_add" [label="add"]
+"3623_sub" [label="sub"]
+"3623_log10" [label="log10"]
+"3623_toUint" [label="toUint"]
+"3623_average" [label="average"]
+"3623_log2" -> "3623_toUint"
+"3623_sqrt" -> "3623_toUint"
+}subgraph cluster_551_Factory {
+label = "Factory"
+"551_getPoolData" [label="getPoolData"]
+"551_createPool" [label="createPool"]
+"551__setTick" [label="_setTick"]
+"551_getPair" [label="getPair"]
+"551_constructor" [label="constructor"]
+"551_getAllPoolsAddress" [label="getAllPoolsAddress"]
+"551_getPool" [label="getPool"]
+"551_getOwnerPools" [label="getOwnerPools"]
+"551_getTick" [label="getTick"]
+"551_setTicks" [label="setTicks"]
+"551_setTicks" -> "551__setTick"
+"551_constructor" -> "551_constructor"
+"551_constructor" -> "551__setTick"
+"551_setTicks" -> "551_onlyOwner"
+}subgraph cluster_2860_SafeCast {
+label = "SafeCast"
+"2860_toInt256" [label="toInt256"]
+"2860_toUint256" [label="toUint256"]
+}subgraph cluster_2221_IERC20 {
+label = "IERC20"
+"2221_balanceOf" [label="balanceOf"]
+"2221_name" [label="name"]
+"2221_transferFrom" [label="transferFrom"]
+"2221_transfer" [label="transfer"]
+"2221_symbol" [label="symbol"]
+"2221_decimals" [label="decimals"]
+"2221_approve" [label="approve"]
+"2221_totalSupply" [label="totalSupply"]
+"2221_allowance" [label="allowance"]
+}subgraph cluster_2350_IFactory {
+label = "IFactory"
+"2350_setTicks" [label="setTicks"]
+"2350_MAX_POOL_FEE" [label="MAX_POOL_FEE"]
+"2350_getPoolData" [label="getPoolData"]
+"2350_MIN_POOL_FEE" [label="MIN_POOL_FEE"]
+"2350_owner" [label="owner"]
+"2350_getAllPoolsAddress" [label="getAllPoolsAddress"]
+"2350_getOwnerPools" [label="getOwnerPools"]
+"2350_MAX_TICK" [label="MAX_TICK"]
+"2350_s_poolCount" [label="s_poolCount"]
+"2350_transferOwnership" [label="transferOwnership"]
+"2350_createPool" [label="createPool"]
+"2350_getPool" [label="getPool"]
+"2350_getTick" [label="getTick"]
+"2350_getPair" [label="getPair"]
+}subgraph cluster_2511_IPool {
+label = "IPool"
+"2511_swapTokensExactInput" [label="swapTokensExactInput"]
+"2511_TOKENB" [label="TOKENB"]
+"2511_FEE" [label="FEE"]
+"2511__addLiquidity" [label="_addLiquidity"]
+"2511__removeLiquidity" [label="_removeLiquidity"]
+"2511_removeLiquidity" [label="removeLiquidity"]
+"2511__mintLiquidity" [label="_mintLiquidity"]
+"2511_FACTORY" [label="FACTORY"]
+"2511_TOKENA" [label="TOKENA"]
+"2511_swapTokensExactOutput" [label="swapTokensExactOutput"]
+"2511_addLiquidity" [label="addLiquidity"]
+"2511_TICK" [label="TICK"]
+}subgraph cluster_947_LP_ERC20 {
+label = "LP_ERC20"
+"947_approve" [label="approve"]
+"947__update" [label="_update"]
+"947__mint" [label="_mint"]
+"947__burn" [label="_burn"]
+"947__spendAllowance" [label="_spendAllowance"]
+"947_transferFrom" [label="transferFrom"]
+"947__transfer" [label="_transfer"]
+"947__approve" [label="_approve"]
+"947_transfer" [label="transfer"]
+"947_transferFrom" -> "947__spendAllowance"
+"947_approve" -> "947__approve"
+"947__transfer" -> "947__update"
+"947__mint" -> "947__update"
+"947__approve" -> "947__approve"
+"947__burn" -> "947__update"
+"947_transferFrom" -> "947__transfer"
+"947_transfer" -> "947__transfer"
+"947__spendAllowance" -> "947__approve"
+}subgraph cluster_2137_Pool {
+label = "Pool"
+"2137__addLiquidity" [label="_addLiquidity"]
+"2137__mintLiquidity" [label="_mintLiquidity"]
+"2137__removeLiquidity" [label="_removeLiquidity"]
+"2137_removeLiquidity" [label="removeLiquidity"]
+"2137__safeTransfer" [label="_safeTransfer"]
+"2137_swapTokensExactInput" [label="swapTokensExactInput"]
+"2137_swapTokensExactOutput" [label="swapTokensExactOutput"]
+"2137_constructor" [label="constructor"]
+"2137_addLiquidity" [label="addLiquidity"]
+"2137__safeTransferFrom" [label="_safeTransferFrom"]
+"2137_mintLiquidity" [label="mintLiquidity"]
+"2137_addLiquidity" -> "2137__addLiquidity"
+"2137_removeLiquidity" -> "2137_zeroAddress"
+"2137_swapTokensExactOutput" -> "2137_ensure"
+"2137_swapTokensExactInput" -> "2137__safeTransfer"
+"2137_addLiquidity" -> "2137_nonReentrant"
+"2137_swapTokensExactOutput" -> "2137__safeTransferFrom"
+"2137_addLiquidity" -> "2137_ensure"
+"2137_addLiquidity" -> "2137__safeTransferFrom"
+"2137_mintLiquidity" -> "2137__mint"
+"2137_removeLiquidity" -> "2137__removeLiquidity"
+"2137_swapTokensExactInput" -> "2137_ensure"
+"2137_swapTokensExactInput" -> "2137_nonReentrant"
+"2137_addLiquidity" -> "2137__mintLiquidity"
+"2137_swapTokensExactOutput" -> "2137_zeroAddress"
+"2137_removeLiquidity" -> "2137__safeTransfer"
+"2137_removeLiquidity" -> "2137__burn"
+"2137_swapTokensExactOutput" -> "2137__safeTransfer"
+"2137_addLiquidity" -> "2137_zeroAddress"
+"2137_addLiquidity" -> "2137__mint"
+"2137_swapTokensExactInput" -> "2137__safeTransferFrom"
+"2137_removeLiquidity" -> "2137_nonReentrant"
+"2137_swapTokensExactInput" -> "2137_zeroAddress"
+"2137_swapTokensExactOutput" -> "2137_nonReentrant"
+"2137_removeLiquidity" -> "2137_ensure"
+}subgraph cluster_3771_ReentrancyGuard {
+label = "ReentrancyGuard"
+"3771__nonReentrantAfter" [label="_nonReentrantAfter"]
+"3771__nonReentrantBefore" [label="_nonReentrantBefore"]
+"3771_constructor" [label="constructor"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"abi.decode()" 
+"require(bool,string)" 
+"require(bool)" 
+"abi.encodeWithSelector()" 
+"2137__removeLiquidity" -> "require(bool,string)"
+"551_constructor" -> "require(bool,string)"
+"2137__safeTransferFrom" -> "abi.decode()"
+"2137__safeTransfer" -> "abi.encodeWithSelector()"
+"3719_constructor" -> "require(bool,string)"
+"2137__mintLiquidity" -> "require(bool,string)"
+"3623_mod" -> "require(bool,string)"
+"2137__addLiquidity" -> "require(bool,string)"
+"2860_toInt256" -> "require(bool,string)"
+"3719_transferOwnership" -> "require(bool,string)"
+"2137_swapTokensExactOutput" -> "require(bool,string)"
+"947__transfer" -> "require(bool,string)"
+"3623_div" -> "require(bool,string)"
+"2787_getAmountIn" -> "require(bool,string)"
+"947__mint" -> "require(bool,string)"
+"947__approve" -> "require(bool,string)"
+"2137_swapTokensExactInput" -> "require(bool,string)"
+"551_setTicks" -> "require(bool,string)"
+"2787_getAmountOut" -> "require(bool,string)"
+"947__update" -> "require(bool,string)"
+"2137__safeTransfer" -> "require(bool,string)"
+"947__spendAllowance" -> "require(bool,string)"
+"2860_toUint256" -> "require(bool,string)"
+"2137_mintLiquidity" -> "require(bool,string)"
+"3623_sub" -> "require(bool)"
+"2137__safeTransferFrom" -> "require(bool,string)"
+"2787_quote" -> "require(bool,string)"
+"551_createPool" -> "require(bool,string)"
+"2137__safeTransferFrom" -> "abi.encodeWithSelector()"
+"551__setTick" -> "require(bool,string)"
+"3623_mul" -> "require(bool)"
+"2137_removeLiquidity" -> "require(bool,string)"
+"947__burn" -> "require(bool,string)"
+"2137__safeTransfer" -> "abi.decode()"
+"3771__nonReentrantBefore" -> "require(bool,string)"
+"3719__checkOwner" -> "require(bool,string)"
+"3623_add" -> "require(bool)"
+}"2787_quote" -> "3623_div"
+"2137_mintLiquidity" -> "2350_owner"
+"2137_swapTokensExactInput" -> "2787_getCurrentPrice"
+"2787_quote" -> "3623_mul"
+"2137__mintLiquidity" -> "3623_div"
+"2137__addLiquidity" -> "2787_quote"
+"2787_getAmountOut" -> "3623_mul"
+"947__spendAllowance" -> "3623_sub"
+"2137_addLiquidity" -> "2221_balanceOf"
+"2787_getPriceRange" -> "3623_sqrt"
+"947__update" -> "3623_sub"
+"947__update" -> "3623_add"
+"2137__mintLiquidity" -> "3623_sub"
+"2137_swapTokensExactInput" -> "3623_sub"
+"2137_swapTokensExactOutput" -> "3623_add"
+"551_constructor" -> "3623_add"
+"2137_swapTokensExactOutput" -> "2221_decimals"
+"2787_getAmountIn" -> "3623_sub"
+"551_setTicks" -> "3623_add"
+"2137__mintLiquidity" -> "3623_mul"
+"2137__removeLiquidity" -> "3623_div"
+"2137_removeLiquidity" -> "2221_balanceOf"
+"2137_swapTokensExactInput" -> "2221_decimals"
+"551_createPool" -> "3623_mod"
+"2787_getAmountOut" -> "3623_add"
+"2137_swapTokensExactInput" -> "2787_getAmountFee"
+"2787_getAmountIn" -> "3623_mul"
+"2137_swapTokensExactOutput" -> "2787_getAmountIn"
+"2787_getAmountIn" -> "3623_div"
+"2137_swapTokensExactInput" -> "2787_getAmountOut"
+"2787_getAmountOut" -> "3623_div"
+"2787_getCurrentPrice" -> "3623_div"
+"2137_swapTokensExactOutput" -> "2787_getPriceRange"
+"2137_swapTokensExactInput" -> "2221_balanceOf"
+"2137_swapTokensExactOutput" -> "2787_getAmountFee"
+"2137__mintLiquidity" -> "3623_sqrt"
+"2787_getAmountFee" -> "3623_div"
+"2787_getCurrentPrice" -> "3623_mul"
+"2137__removeLiquidity" -> "3623_mul"
+"2787_getPriceRange" -> "3623_log2"
+"2137_swapTokensExactOutput" -> "2787_getCurrentPrice"
+"2137_swapTokensExactInput" -> "2787_getPriceRange"
+"2787_getAmountFee" -> "3623_mul"
+"2137__removeLiquidity" -> "2221_balanceOf"
+"2137__mintLiquidity" -> "3623_min"
+"2137_swapTokensExactOutput" -> "2221_balanceOf"
+}

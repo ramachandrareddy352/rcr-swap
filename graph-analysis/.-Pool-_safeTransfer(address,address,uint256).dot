@@ -1,0 +1,34 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: NEW VARIABLE 1
+"];
+1->2;
+2[label="Node Type: NEW VARIABLE 2
+"];
+2->3;
+3[label="Node Type: EXPRESSION 3
+
+EXPRESSION:
+(success,data) = token.call(abi.encodeWithSelector(TRANSFER_SELECTOR,to,value))
+
+IRs:
+TMP_175(bytes) = SOLIDITY_CALL abi.encodeWithSelector()(TRANSFER_SELECTOR,to,value)
+TUPLE_0(bool,bytes) = LOW_LEVEL_CALL, dest:token, function:call, arguments:['TMP_175']  
+success(bool)= UNPACK TUPLE_0 index: 0 
+data(bytes)= UNPACK TUPLE_0 index: 1 "];
+3->4;
+4[label="Node Type: EXPRESSION 4
+
+EXPRESSION:
+require(bool,string)(success && (data.length == 0 || abi.decode(data,(bool))),POOL : Transfer failed)
+
+IRs:
+REF_84 -> LENGTH data
+TMP_176(bool) = REF_84 == 0
+TMP_177(bool) = SOLIDITY_CALL abi.decode()(data,bool)
+TMP_178(bool) = TMP_176 || TMP_177
+TMP_179(bool) = success && TMP_178
+TMP_180(None) = SOLIDITY_CALL require(bool,string)(TMP_179,POOL : Transfer failed)"];
+}

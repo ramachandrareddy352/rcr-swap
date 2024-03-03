@@ -1,0 +1,119 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->10;
+1[label="Node Type: NEW VARIABLE 1
+
+EXPRESSION:
+m_reserveA = IERC20(TOKENA).balanceOf(address(this))
+
+IRs:
+TMP_210 = CONVERT TOKENA to IERC20
+TMP_211 = CONVERT this to address
+TMP_212(uint256) = HIGH_LEVEL_CALL, dest:TMP_210(IERC20), function:balanceOf, arguments:['TMP_211']  
+m_reserveA(uint256) := TMP_212(uint256)"];
+1->2;
+2[label="Node Type: NEW VARIABLE 2
+
+EXPRESSION:
+m_reserveB = IERC20(TOKENB).balanceOf(address(this))
+
+IRs:
+TMP_213 = CONVERT TOKENB to IERC20
+TMP_214 = CONVERT this to address
+TMP_215(uint256) = HIGH_LEVEL_CALL, dest:TMP_213(IERC20), function:balanceOf, arguments:['TMP_214']  
+m_reserveB(uint256) := TMP_215(uint256)"];
+2->3;
+3[label="Node Type: NEW VARIABLE 3
+
+EXPRESSION:
+sender = msg.sender
+
+IRs:
+sender(address) := msg.sender(address)"];
+3->4;
+4[label="Node Type: EXPRESSION 4
+
+EXPRESSION:
+(amountA,amountB) = _addLiquidity(_amountADesired,_amountBDesired,_amountAMin,_amountBMin,m_reserveA,m_reserveB)
+
+IRs:
+TUPLE_2(uint256,uint256) = INTERNAL_CALL, Pool._addLiquidity(uint256,uint256,uint256,uint256,uint256,uint256)(_amountADesired,_amountBDesired,_amountAMin,_amountBMin,m_reserveA,m_reserveB)
+amountA(uint256)= UNPACK TUPLE_2 index: 0 
+amountB(uint256)= UNPACK TUPLE_2 index: 1 "];
+4->5;
+5[label="Node Type: EXPRESSION 5
+
+EXPRESSION:
+liquidity = _mintLiquidity(amountA,amountB,m_reserveA,m_reserveB)
+
+IRs:
+TMP_216(uint256) = INTERNAL_CALL, Pool._mintLiquidity(uint256,uint256,uint256,uint256)(amountA,amountB,m_reserveA,m_reserveB)
+liquidity(uint256) := TMP_216(uint256)"];
+5->6;
+6[label="Node Type: EXPRESSION 6
+
+EXPRESSION:
+_safeTransferFrom(TOKENA,sender,address(this),amountA)
+
+IRs:
+TMP_217 = CONVERT this to address
+INTERNAL_CALL, Pool._safeTransferFrom(address,address,address,uint256)(TOKENA,sender,TMP_217,amountA)"];
+6->7;
+7[label="Node Type: EXPRESSION 7
+
+EXPRESSION:
+_safeTransferFrom(TOKENB,sender,address(this),amountB)
+
+IRs:
+TMP_219 = CONVERT this to address
+INTERNAL_CALL, Pool._safeTransferFrom(address,address,address,uint256)(TOKENB,sender,TMP_219,amountB)"];
+7->8;
+8[label="Node Type: EXPRESSION 8
+
+EXPRESSION:
+_mint(_to,liquidity)
+
+IRs:
+INTERNAL_CALL, LP_ERC20._mint(address,uint256)(_to,liquidity)"];
+8->9;
+9[label="Node Type: EXPRESSION 9
+
+EXPRESSION:
+AddLiquidity(sender,_to,amountA,amountB,liquidity)
+
+IRs:
+Emit AddLiquidity(sender,_to,amountA,amountB,liquidity)"];
+10[label="Node Type: EXPRESSION 10
+
+EXPRESSION:
+nonReentrant()
+
+IRs:
+MODIFIER_CALL, ReentrancyGuard.nonReentrant()()"];
+10->11;
+11[label="Node Type: EXPRESSION 11
+
+EXPRESSION:
+ensure(_deadline)
+
+IRs:
+MODIFIER_CALL, Pool.ensure(uint256)(_deadline)"];
+11->12;
+12[label="Node Type: EXPRESSION 12
+
+EXPRESSION:
+zeroAddress(_to)
+
+IRs:
+MODIFIER_CALL, Pool.zeroAddress(address)(_to)"];
+12->13;
+13[label="Node Type: EXPRESSION 13
+
+EXPRESSION:
+zeroAddress(msg.sender)
+
+IRs:
+MODIFIER_CALL, Pool.zeroAddress(address)(msg.sender)"];
+13->1;
+}

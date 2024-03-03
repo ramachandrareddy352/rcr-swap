@@ -1,0 +1,20 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: INLINE ASM 1
+"];
+1->2;
+2[label="Node Type: EXPRESSION 2
+
+EXPRESSION:
+u = ! ! b
+
+IRs:
+TMP_562 = UnaryType.BANG b 
+TMP_563 = UnaryType.BANG TMP_562 
+u(uint256) := TMP_563(bool)"];
+2->3;
+3[label="Node Type: END INLINE ASM 3
+"];
+}

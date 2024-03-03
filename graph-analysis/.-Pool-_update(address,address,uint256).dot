@@ -1,0 +1,106 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(value > 0,LP_ERC20 : Zero amount)
+
+IRs:
+TMP_137(bool) = value > 0
+TMP_138(None) = SOLIDITY_CALL require(bool,string)(TMP_137,LP_ERC20 : Zero amount)"];
+1->2;
+2[label="Node Type: IF 2
+
+EXPRESSION:
+from == address(0)
+
+IRs:
+TMP_139 = CONVERT 0 to address
+TMP_140(bool) = from == TMP_139
+CONDITION TMP_140"];
+2->3[label="True"];
+2->4[label="False"];
+3[label="Node Type: EXPRESSION 3
+
+EXPRESSION:
+totalSupply = totalSupply.add(value)
+
+IRs:
+TMP_141(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.add(uint256,uint256), arguments:['totalSupply', 'value'] 
+totalSupply(uint256) := TMP_141(uint256)"];
+3->7;
+4[label="Node Type: NEW VARIABLE 4
+
+EXPRESSION:
+fromBalance = balanceOf[from]
+
+IRs:
+REF_70(uint256) -> balanceOf[from]
+fromBalance(uint256) := REF_70(uint256)"];
+4->5;
+5[label="Node Type: EXPRESSION 5
+
+EXPRESSION:
+require(bool,string)(fromBalance >= value,LP_ERC20 : Invalid amount)
+
+IRs:
+TMP_142(bool) = fromBalance >= value
+TMP_143(None) = SOLIDITY_CALL require(bool,string)(TMP_142,LP_ERC20 : Invalid amount)"];
+5->6;
+6[label="Node Type: EXPRESSION 6
+
+EXPRESSION:
+balanceOf[from] = fromBalance.sub(value)
+
+IRs:
+REF_71(uint256) -> balanceOf[from]
+TMP_144(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.sub(uint256,uint256), arguments:['fromBalance', 'value'] 
+REF_71(uint256) (->balanceOf) := TMP_144(uint256)"];
+6->7;
+7[label="Node Type: END_IF 7
+"];
+7->8;
+8[label="Node Type: IF 8
+
+EXPRESSION:
+to == address(0)
+
+IRs:
+TMP_145 = CONVERT 0 to address
+TMP_146(bool) = to == TMP_145
+CONDITION TMP_146"];
+8->9[label="True"];
+8->10[label="False"];
+9[label="Node Type: EXPRESSION 9
+
+EXPRESSION:
+totalSupply = totalSupply.sub(value)
+
+IRs:
+TMP_147(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.sub(uint256,uint256), arguments:['totalSupply', 'value'] 
+totalSupply(uint256) := TMP_147(uint256)"];
+9->11;
+10[label="Node Type: EXPRESSION 10
+
+EXPRESSION:
+balanceOf[to] = balanceOf[to].add(value)
+
+IRs:
+REF_74(uint256) -> balanceOf[to]
+REF_75(uint256) -> balanceOf[to]
+TMP_148(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.add(uint256,uint256), arguments:['REF_75', 'value'] 
+REF_74(uint256) (->balanceOf) := TMP_148(uint256)"];
+10->11;
+11[label="Node Type: END_IF 11
+"];
+11->12;
+12[label="Node Type: EXPRESSION 12
+
+EXPRESSION:
+Transfer(from,to,value)
+
+IRs:
+Emit Transfer(from,to,value)"];
+}

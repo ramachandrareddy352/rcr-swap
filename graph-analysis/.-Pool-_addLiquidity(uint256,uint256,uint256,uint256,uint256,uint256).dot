@@ -1,0 +1,104 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: IF 1
+
+EXPRESSION:
+_reserveA == 0 && _reserveB == 0
+
+IRs:
+TMP_187(bool) = _reserveA == 0
+TMP_188(bool) = _reserveB == 0
+TMP_189(bool) = TMP_187 && TMP_188
+CONDITION TMP_189"];
+1->2[label="True"];
+1->3[label="False"];
+2[label="Node Type: EXPRESSION 2
+
+EXPRESSION:
+(amountA,amountB) = (_amountADesired,_amountBDesired)
+
+IRs:
+amountA(uint256) := _amountADesired(uint256)
+amountB(uint256) := _amountBDesired(uint256)"];
+2->12;
+3[label="Node Type: NEW VARIABLE 3
+
+EXPRESSION:
+m_amountBOptimal = PoolLibrary.quote(_amountADesired,_reserveA,_reserveB)
+
+IRs:
+TMP_190(uint256) = LIBRARY_CALL, dest:PoolLibrary, function:PoolLibrary.quote(uint256,uint256,uint256), arguments:['_amountADesired', '_reserveA', '_reserveB'] 
+m_amountBOptimal(uint256) := TMP_190(uint256)"];
+3->4;
+4[label="Node Type: IF 4
+
+EXPRESSION:
+m_amountBOptimal <= _amountBDesired
+
+IRs:
+TMP_191(bool) = m_amountBOptimal <= _amountBDesired
+CONDITION TMP_191"];
+4->5[label="True"];
+4->7[label="False"];
+5[label="Node Type: EXPRESSION 5
+
+EXPRESSION:
+require(bool,string)(m_amountBOptimal >= _amountBMin,POOL : Optimal amount-B exceed)
+
+IRs:
+TMP_192(bool) = m_amountBOptimal >= _amountBMin
+TMP_193(None) = SOLIDITY_CALL require(bool,string)(TMP_192,POOL : Optimal amount-B exceed)"];
+5->6;
+6[label="Node Type: EXPRESSION 6
+
+EXPRESSION:
+(amountA,amountB) = (_amountADesired,m_amountBOptimal)
+
+IRs:
+amountA(uint256) := _amountADesired(uint256)
+amountB(uint256) := m_amountBOptimal(uint256)"];
+6->11;
+7[label="Node Type: NEW VARIABLE 7
+
+EXPRESSION:
+m_amountAOptimal = PoolLibrary.quote(_amountBDesired,_reserveB,_reserveA)
+
+IRs:
+TMP_194(uint256) = LIBRARY_CALL, dest:PoolLibrary, function:PoolLibrary.quote(uint256,uint256,uint256), arguments:['_amountBDesired', '_reserveB', '_reserveA'] 
+m_amountAOptimal(uint256) := TMP_194(uint256)"];
+7->8;
+8[label="Node Type: EXPRESSION 8
+
+EXPRESSION:
+require(bool,string)(m_amountAOptimal <= _amountADesired,POOL : Insufficient liquidity added)
+
+IRs:
+TMP_195(bool) = m_amountAOptimal <= _amountADesired
+TMP_196(None) = SOLIDITY_CALL require(bool,string)(TMP_195,POOL : Insufficient liquidity added)"];
+8->9;
+9[label="Node Type: EXPRESSION 9
+
+EXPRESSION:
+require(bool,string)(m_amountAOptimal >= _amountAMin,POOL : Optimal amount-A exceed)
+
+IRs:
+TMP_197(bool) = m_amountAOptimal >= _amountAMin
+TMP_198(None) = SOLIDITY_CALL require(bool,string)(TMP_197,POOL : Optimal amount-A exceed)"];
+9->10;
+10[label="Node Type: EXPRESSION 10
+
+EXPRESSION:
+(amountA,amountB) = (m_amountAOptimal,_amountBDesired)
+
+IRs:
+amountA(uint256) := m_amountAOptimal(uint256)
+amountB(uint256) := _amountBDesired(uint256)"];
+10->11;
+11[label="Node Type: END_IF 11
+"];
+11->12;
+12[label="Node Type: END_IF 12
+"];
+}

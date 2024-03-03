@@ -1,0 +1,17 @@
+digraph{
+0[label="Node Type: OTHER_ENTRYPOINT 0
+
+EXPRESSION:
+NOT_ENTERED = 1
+
+IRs:
+NOT_ENTERED(uint256) := 1(uint256)"];
+0->1;
+1[label="Node Type: OTHER_ENTRYPOINT 1
+
+EXPRESSION:
+ENTERED = 2
+
+IRs:
+ENTERED(uint256) := 2(uint256)"];
+}

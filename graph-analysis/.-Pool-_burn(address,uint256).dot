@@ -1,0 +1,23 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(account != address(0),LP_ERC20 : Invalid zero address)
+
+IRs:
+TMP_155 = CONVERT 0 to address
+TMP_156(bool) = account != TMP_155
+TMP_157(None) = SOLIDITY_CALL require(bool,string)(TMP_156,LP_ERC20 : Invalid zero address)"];
+1->2;
+2[label="Node Type: EXPRESSION 2
+
+EXPRESSION:
+_update(account,address(0),value)
+
+IRs:
+TMP_158 = CONVERT 0 to address
+INTERNAL_CALL, LP_ERC20._update(address,address,uint256)(account,TMP_158,value)"];
+}

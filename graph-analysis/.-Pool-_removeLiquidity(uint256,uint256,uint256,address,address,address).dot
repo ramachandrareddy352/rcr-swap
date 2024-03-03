@@ -1,0 +1,74 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: NEW VARIABLE 1
+
+EXPRESSION:
+m_reserveA = IERC20(_tokenA).balanceOf(_pool)
+
+IRs:
+TMP_227 = CONVERT _tokenA to IERC20
+TMP_228(uint256) = HIGH_LEVEL_CALL, dest:TMP_227(IERC20), function:balanceOf, arguments:['_pool']  
+m_reserveA(uint256) := TMP_228(uint256)"];
+1->2;
+2[label="Node Type: NEW VARIABLE 2
+
+EXPRESSION:
+m_reserveB = IERC20(_tokenB).balanceOf(_pool)
+
+IRs:
+TMP_229 = CONVERT _tokenB to IERC20
+TMP_230(uint256) = HIGH_LEVEL_CALL, dest:TMP_229(IERC20), function:balanceOf, arguments:['_pool']  
+m_reserveB(uint256) := TMP_230(uint256)"];
+2->3;
+3[label="Node Type: NEW VARIABLE 3
+
+EXPRESSION:
+m_totalSupply = totalSupply
+
+IRs:
+m_totalSupply(uint256) := totalSupply(uint256)"];
+3->4;
+4[label="Node Type: EXPRESSION 4
+
+EXPRESSION:
+amountA = (m_reserveA.mul(_liquidity)).div(m_totalSupply)
+
+IRs:
+TMP_231(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.mul(uint256,uint256), arguments:['m_reserveA', '_liquidity'] 
+TMP_232(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.div(uint256,uint256), arguments:['TMP_231', 'm_totalSupply'] 
+amountA(uint256) := TMP_232(uint256)"];
+4->5;
+5[label="Node Type: EXPRESSION 5
+
+EXPRESSION:
+amountB = (m_reserveB.mul(_liquidity)).div(m_totalSupply)
+
+IRs:
+TMP_233(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.mul(uint256,uint256), arguments:['m_reserveB', '_liquidity'] 
+TMP_234(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.div(uint256,uint256), arguments:['TMP_233', 'm_totalSupply'] 
+amountB(uint256) := TMP_234(uint256)"];
+5->6;
+6[label="Node Type: EXPRESSION 6
+
+EXPRESSION:
+require(bool,string)(amountA > 0 && amountA >= _amountAMin,POOL : Insufficient token-A)
+
+IRs:
+TMP_235(bool) = amountA > 0
+TMP_236(bool) = amountA >= _amountAMin
+TMP_237(bool) = TMP_235 && TMP_236
+TMP_238(None) = SOLIDITY_CALL require(bool,string)(TMP_237,POOL : Insufficient token-A)"];
+6->7;
+7[label="Node Type: EXPRESSION 7
+
+EXPRESSION:
+require(bool,string)(amountB > 0 && amountB >= _amountBMin,POOL : Insufficient token-B)
+
+IRs:
+TMP_239(bool) = amountB > 0
+TMP_240(bool) = amountB >= _amountBMin
+TMP_241(bool) = TMP_239 && TMP_240
+TMP_242(None) = SOLIDITY_CALL require(bool,string)(TMP_241,POOL : Insufficient token-B)"];
+}

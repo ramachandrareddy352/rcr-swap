@@ -1,0 +1,15 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+price = (_reserveOut.mul(10 ** _reserveInDecimals)).div(_reserveIn)
+
+IRs:
+TMP_398(uint256) = 10 (c)** _reserveInDecimals
+TMP_399(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.mul(uint256,uint256), arguments:['_reserveOut', 'TMP_398'] 
+TMP_400(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.div(uint256,uint256), arguments:['TMP_399', '_reserveIn'] 
+price(uint256) := TMP_400(uint256)"];
+}

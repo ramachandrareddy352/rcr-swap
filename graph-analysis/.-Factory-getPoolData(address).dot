@@ -1,0 +1,24 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: NEW VARIABLE 1
+
+EXPRESSION:
+pool = s_getPoolData[_pool]
+
+IRs:
+REF_46(Factory._Pool) -> s_getPoolData[_pool]
+pool(Factory._Pool) := REF_46(Factory._Pool)"];
+1->2;
+2[label="Node Type: RETURN 2
+
+EXPRESSION:
+(pool.tokenA,pool.tokenB,pool.fee)
+
+IRs:
+REF_47(address) -> pool.tokenA
+REF_48(address) -> pool.tokenB
+REF_49(uint256) -> pool.fee
+RETURN REF_47,REF_48,REF_49"];
+}

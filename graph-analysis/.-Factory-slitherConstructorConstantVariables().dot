@@ -1,0 +1,25 @@
+digraph{
+0[label="Node Type: OTHER_ENTRYPOINT 0
+
+EXPRESSION:
+MAX_POOL_FEE = 10000
+
+IRs:
+MAX_POOL_FEE(uint256) := 10000(uint256)"];
+0->1;
+1[label="Node Type: OTHER_ENTRYPOINT 1
+
+EXPRESSION:
+MIN_POOL_FEE = 100
+
+IRs:
+MIN_POOL_FEE(uint256) := 100(uint256)"];
+1->2;
+2[label="Node Type: OTHER_ENTRYPOINT 2
+
+EXPRESSION:
+MAX_TICK = 10000
+
+IRs:
+MAX_TICK(uint256) := 10000(uint256)"];
+}

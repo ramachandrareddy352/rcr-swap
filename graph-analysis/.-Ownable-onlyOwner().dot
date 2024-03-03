@@ -1,0 +1,15 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+_checkOwner()
+
+IRs:
+INTERNAL_CALL, Ownable._checkOwner()()"];
+1->2;
+2[label="Node Type: _ 2
+"];
+}

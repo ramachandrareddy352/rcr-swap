@@ -100,7 +100,7 @@ contract Factory is Ownable {
         // tick should be in range of 0-100(better positions at x+y = 1 Million * 10**18)
         // (1-3) best for one stabel and non-stabel
         // (4-20) for both stable
-        require(_tokenA != address(0) && _tokenA != _tokenB, "Factory : Invalid zero address");
+        require(_tokenA != address(0) && _tokenB != address(0) && _tokenA != _tokenB, "Factory : Invalid zero address");
         require(_tick <= MAX_TICK, "Factory : High tick position");
         require(s_getTick[_tokenA][_tokenB] == 0, "Factory : Tick already exist");
         s_getTick[_tokenA][_tokenB] = _tick;
@@ -111,8 +111,9 @@ contract Factory is Ownable {
         return s_ownerPools[_owner];
     }
 
-    function getPoolData(address _pool) external view returns (_Pool memory) {
-        return s_getPoolData[_pool];
+    function getPoolData(address _pool) external view returns (address tokenA, address tokenB, uint256 fee) {
+        _Pool memory pool = s_getPoolData[_pool];
+        return (pool.tokenA, pool.tokenB, pool.fee);
     }
 
     function getPool(uint256 _id) external view returns (_Pool memory) {

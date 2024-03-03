@@ -1,0 +1,59 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(_tokenA != address(0) && _tokenB != address(0) && _tokenA != _tokenB,Factory : Invalid zero address)
+
+IRs:
+TMP_62 = CONVERT 0 to address
+TMP_63(bool) = _tokenA != TMP_62
+TMP_64 = CONVERT 0 to address
+TMP_65(bool) = _tokenB != TMP_64
+TMP_66(bool) = TMP_63 && TMP_65
+TMP_67(bool) = _tokenA != _tokenB
+TMP_68(bool) = TMP_66 && TMP_67
+TMP_69(None) = SOLIDITY_CALL require(bool,string)(TMP_68,Factory : Invalid zero address)"];
+1->2;
+2[label="Node Type: EXPRESSION 2
+
+EXPRESSION:
+require(bool,string)(_tick <= MAX_TICK,Factory : High tick position)
+
+IRs:
+TMP_70(bool) = _tick <= MAX_TICK
+TMP_71(None) = SOLIDITY_CALL require(bool,string)(TMP_70,Factory : High tick position)"];
+2->3;
+3[label="Node Type: EXPRESSION 3
+
+EXPRESSION:
+require(bool,string)(s_getTick[_tokenA][_tokenB] == 0,Factory : Tick already exist)
+
+IRs:
+REF_39(mapping(address => uint256)) -> s_getTick[_tokenA]
+REF_40(uint256) -> REF_39[_tokenB]
+TMP_72(bool) = REF_40 == 0
+TMP_73(None) = SOLIDITY_CALL require(bool,string)(TMP_72,Factory : Tick already exist)"];
+3->4;
+4[label="Node Type: EXPRESSION 4
+
+EXPRESSION:
+s_getTick[_tokenA][_tokenB] = _tick
+
+IRs:
+REF_41(mapping(address => uint256)) -> s_getTick[_tokenA]
+REF_42(uint256) -> REF_41[_tokenB]
+REF_42(uint256) (->s_getTick) := _tick(uint256)"];
+4->5;
+5[label="Node Type: EXPRESSION 5
+
+EXPRESSION:
+s_getTick[_tokenB][_tokenA] = _tick
+
+IRs:
+REF_43(mapping(address => uint256)) -> s_getTick[_tokenB]
+REF_44(uint256) -> REF_43[_tokenA]
+REF_44(uint256) (->s_getTick) := _tick(uint256)"];
+}

@@ -1,0 +1,72 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->8;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(_tokenA.length == _tokenB.length && _tokenA.length == _tick.length,Factory : Invalid length)
+
+IRs:
+REF_30 -> LENGTH _tokenA
+REF_31 -> LENGTH _tokenB
+TMP_54(bool) = REF_30 == REF_31
+REF_32 -> LENGTH _tokenA
+REF_33 -> LENGTH _tick
+TMP_55(bool) = REF_32 == REF_33
+TMP_56(bool) = TMP_54 && TMP_55
+TMP_57(None) = SOLIDITY_CALL require(bool,string)(TMP_56,Factory : Invalid length)"];
+1->4;
+2[label="Node Type: BEGIN_LOOP 2
+"];
+2->5;
+3[label="Node Type: END_LOOP 3
+"];
+4[label="Node Type: NEW VARIABLE 4
+
+EXPRESSION:
+i = 0
+
+IRs:
+i(uint256) := 0(uint256)"];
+4->2;
+5[label="Node Type: IF_LOOP 5
+
+EXPRESSION:
+i < _tokenA.length
+
+IRs:
+REF_34 -> LENGTH _tokenA
+TMP_58(bool) = i < REF_34
+CONDITION TMP_58"];
+5->6[label="True"];
+5->3[label="False"];
+6[label="Node Type: EXPRESSION 6
+
+EXPRESSION:
+_setTick(_tokenA[i],_tokenB[i],_tick[i])
+
+IRs:
+REF_35(address) -> _tokenA[i]
+REF_36(address) -> _tokenB[i]
+REF_37(uint256) -> _tick[i]
+INTERNAL_CALL, Factory._setTick(address,address,uint256)(REF_35,REF_36,REF_37)"];
+6->7;
+7[label="Node Type: EXPRESSION 7
+
+EXPRESSION:
+i = i.add(1)
+
+IRs:
+TMP_60(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.add(uint256,uint256), arguments:['i', '1'] 
+i(uint256) := TMP_60(uint256)"];
+7->5;
+8[label="Node Type: EXPRESSION 8
+
+EXPRESSION:
+onlyOwner()
+
+IRs:
+MODIFIER_CALL, Ownable.onlyOwner()()"];
+8->1;
+}

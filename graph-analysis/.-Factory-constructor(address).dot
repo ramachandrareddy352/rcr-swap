@@ -1,0 +1,22 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(initialOwner != address(0),Ownable : Invalldi zero address)
+
+IRs:
+TMP_0 = CONVERT 0 to address
+TMP_1(bool) = initialOwner != TMP_0
+TMP_2(None) = SOLIDITY_CALL require(bool,string)(TMP_1,Ownable : Invalldi zero address)"];
+1->2;
+2[label="Node Type: EXPRESSION 2
+
+EXPRESSION:
+_transferOwnership(initialOwner)
+
+IRs:
+INTERNAL_CALL, Ownable._transferOwnership(address)(initialOwner)"];
+}

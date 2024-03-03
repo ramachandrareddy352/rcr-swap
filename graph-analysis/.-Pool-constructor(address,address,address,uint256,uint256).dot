@@ -1,0 +1,44 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+FACTORY = _factory
+
+IRs:
+FACTORY(address) := _factory(address)"];
+1->2;
+2[label="Node Type: EXPRESSION 2
+
+EXPRESSION:
+TOKENA = _tokenA
+
+IRs:
+TOKENA(address) := _tokenA(address)"];
+2->3;
+3[label="Node Type: EXPRESSION 3
+
+EXPRESSION:
+TOKENB = _tokenB
+
+IRs:
+TOKENB(address) := _tokenB(address)"];
+3->4;
+4[label="Node Type: EXPRESSION 4
+
+EXPRESSION:
+FEE = _fee
+
+IRs:
+FEE(uint256) := _fee(uint256)"];
+4->5;
+5[label="Node Type: EXPRESSION 5
+
+EXPRESSION:
+TICK = _tick
+
+IRs:
+TICK(uint256) := _tick(uint256)"];
+}

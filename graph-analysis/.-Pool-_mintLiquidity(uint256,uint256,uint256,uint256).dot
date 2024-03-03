@@ -1,0 +1,58 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: NEW VARIABLE 1
+
+EXPRESSION:
+m_totalSupply = totalSupply
+
+IRs:
+m_totalSupply(uint256) := totalSupply(uint256)"];
+1->2;
+2[label="Node Type: IF 2
+
+EXPRESSION:
+m_totalSupply == 0
+
+IRs:
+TMP_199(bool) = m_totalSupply == 0
+CONDITION TMP_199"];
+2->3[label="True"];
+2->4[label="False"];
+3[label="Node Type: EXPRESSION 3
+
+EXPRESSION:
+liquidity = (SafeMath.sqrt(_amountA.mul(_amountB))).sub(MINIMUM_LIQUIDITY)
+
+IRs:
+TMP_200(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.mul(uint256,uint256), arguments:['_amountA', '_amountB'] 
+TMP_201(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.sqrt(uint256), arguments:['TMP_200'] 
+TMP_202(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.sub(uint256,uint256), arguments:['TMP_201', 'MINIMUM_LIQUIDITY'] 
+liquidity(uint256) := TMP_202(uint256)"];
+3->5;
+4[label="Node Type: EXPRESSION 4
+
+EXPRESSION:
+liquidity = SafeMath.min((_amountA.mul(m_totalSupply)).div(_reserveA),(_amountB.mul(m_totalSupply)).div(_reserveB))
+
+IRs:
+TMP_203(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.mul(uint256,uint256), arguments:['_amountA', 'm_totalSupply'] 
+TMP_204(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.div(uint256,uint256), arguments:['TMP_203', '_reserveA'] 
+TMP_205(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.mul(uint256,uint256), arguments:['_amountB', 'm_totalSupply'] 
+TMP_206(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.div(uint256,uint256), arguments:['TMP_205', '_reserveB'] 
+TMP_207(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.min(uint256,uint256), arguments:['TMP_204', 'TMP_206'] 
+liquidity(uint256) := TMP_207(uint256)"];
+4->5;
+5[label="Node Type: END_IF 5
+"];
+5->6;
+6[label="Node Type: EXPRESSION 6
+
+EXPRESSION:
+require(bool,string)(liquidity > 0,POOL : Invalid mint liquidity)
+
+IRs:
+TMP_208(bool) = liquidity > 0
+TMP_209(None) = SOLIDITY_CALL require(bool,string)(TMP_208,POOL : Invalid mint liquidity)"];
+}

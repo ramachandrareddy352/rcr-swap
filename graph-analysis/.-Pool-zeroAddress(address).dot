@@ -1,0 +1,17 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(_account != address(0),POOL : Invaldi zero address)
+
+IRs:
+TMP_369 = CONVERT 0 to address
+TMP_370(bool) = _account != TMP_369
+TMP_371(None) = SOLIDITY_CALL require(bool,string)(TMP_370,POOL : Invaldi zero address)"];
+1->2;
+2[label="Node Type: _ 2
+"];
+}

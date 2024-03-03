@@ -1,0 +1,224 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->21;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)((_tokenIn == TOKENA && _tokenOut == TOKENB) || (_tokenIn == TOKENB && _tokenOut == TOKENA),POOL : Invalid tokens)
+
+IRs:
+TMP_307(bool) = _tokenIn == TOKENA
+TMP_308(bool) = _tokenOut == TOKENB
+TMP_309(bool) = TMP_307 && TMP_308
+TMP_310(bool) = _tokenIn == TOKENB
+TMP_311(bool) = _tokenOut == TOKENA
+TMP_312(bool) = TMP_310 && TMP_311
+TMP_313(bool) = TMP_309 || TMP_312
+TMP_314(None) = SOLIDITY_CALL require(bool,string)(TMP_313,POOL : Invalid tokens)"];
+1->2;
+2[label="Node Type: NEW VARIABLE 2
+
+EXPRESSION:
+m_reserveIn = IERC20(_tokenIn).balanceOf(address(this))
+
+IRs:
+TMP_315 = CONVERT _tokenIn to IERC20
+TMP_316 = CONVERT this to address
+TMP_317(uint256) = HIGH_LEVEL_CALL, dest:TMP_315(IERC20), function:balanceOf, arguments:['TMP_316']  
+m_reserveIn(uint256) := TMP_317(uint256)"];
+2->3;
+3[label="Node Type: NEW VARIABLE 3
+
+EXPRESSION:
+m_reserveOut = IERC20(_tokenOut).balanceOf(address(this))
+
+IRs:
+TMP_318 = CONVERT _tokenOut to IERC20
+TMP_319 = CONVERT this to address
+TMP_320(uint256) = HIGH_LEVEL_CALL, dest:TMP_318(IERC20), function:balanceOf, arguments:['TMP_319']  
+m_reserveOut(uint256) := TMP_320(uint256)"];
+3->4;
+4[label="Node Type: NEW VARIABLE 4
+
+EXPRESSION:
+m_reserveInDecimals = IERC20(_tokenIn).decimals()
+
+IRs:
+TMP_321 = CONVERT _tokenIn to IERC20
+TMP_322(uint8) = HIGH_LEVEL_CALL, dest:TMP_321(IERC20), function:decimals, arguments:[]  
+m_reserveInDecimals(uint256) := TMP_322(uint8)"];
+4->5;
+5[label="Node Type: EXPRESSION 5
+
+EXPRESSION:
+require(bool,string)(_amountOut > 0 && m_reserveIn > 0 && m_reserveOut > 0,POOL : zero amount)
+
+IRs:
+TMP_323(bool) = _amountOut > 0
+TMP_324(bool) = m_reserveIn > 0
+TMP_325(bool) = TMP_323 && TMP_324
+TMP_326(bool) = m_reserveOut > 0
+TMP_327(bool) = TMP_325 && TMP_326
+TMP_328(None) = SOLIDITY_CALL require(bool,string)(TMP_327,POOL : zero amount)"];
+5->6;
+6[label="Node Type: NEW VARIABLE 6
+
+EXPRESSION:
+before_Price = PoolLibrary.getCurrentPrice(m_reserveIn,m_reserveOut,m_reserveInDecimals)
+
+IRs:
+TMP_329(uint256) = LIBRARY_CALL, dest:PoolLibrary, function:PoolLibrary.getCurrentPrice(uint256,uint256,uint256), arguments:['m_reserveIn', 'm_reserveOut', 'm_reserveInDecimals'] 
+before_Price(uint256) := TMP_329(uint256)"];
+6->7;
+7[label="Node Type: NEW VARIABLE 7
+"];
+7->8;
+8[label="Node Type: NEW VARIABLE 8
+"];
+8->9;
+9[label="Node Type: EXPRESSION 9
+
+EXPRESSION:
+(low_price,high_price) = PoolLibrary.getPriceRange(before_Price,FEE,TICK)
+
+IRs:
+TUPLE_5(uint256,uint256) = LIBRARY_CALL, dest:PoolLibrary, function:PoolLibrary.getPriceRange(uint256,uint256,uint256), arguments:['before_Price', 'FEE', 'TICK'] 
+low_price(uint256)= UNPACK TUPLE_5 index: 0 
+high_price(uint256)= UNPACK TUPLE_5 index: 1 "];
+9->10;
+10[label="Node Type: EXPRESSION 10
+
+EXPRESSION:
+amountIn = PoolLibrary.getAmountIn(_amountOut,m_reserveIn,m_reserveOut)
+
+IRs:
+TMP_330(uint256) = LIBRARY_CALL, dest:PoolLibrary, function:PoolLibrary.getAmountIn(uint256,uint256,uint256), arguments:['_amountOut', 'm_reserveIn', 'm_reserveOut'] 
+amountIn(uint256) := TMP_330(uint256)"];
+10->11;
+11[label="Node Type: EXPRESSION 11
+
+EXPRESSION:
+fee = PoolLibrary.getAmountFee(amountIn,FEE)
+
+IRs:
+TMP_331(uint256) = LIBRARY_CALL, dest:PoolLibrary, function:PoolLibrary.getAmountFee(uint256,uint256), arguments:['amountIn', 'FEE'] 
+fee(uint256) := TMP_331(uint256)"];
+11->12;
+12[label="Node Type: EXPRESSION 12
+
+EXPRESSION:
+amountIn = amountIn.add(fee)
+
+IRs:
+TMP_332(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.add(uint256,uint256), arguments:['amountIn', 'fee'] 
+amountIn(uint256) := TMP_332(uint256)"];
+12->13;
+13[label="Node Type: EXPRESSION 13
+
+EXPRESSION:
+require(bool,string)(amountIn <= _amountInMax,POOL : Excess amount in)
+
+IRs:
+TMP_333(bool) = amountIn <= _amountInMax
+TMP_334(None) = SOLIDITY_CALL require(bool,string)(TMP_333,POOL : Excess amount in)"];
+13->14;
+14[label="Node Type: EXPRESSION 14
+
+EXPRESSION:
+_safeTransferFrom(_tokenIn,msg.sender,address(this),amountIn)
+
+IRs:
+TMP_335 = CONVERT this to address
+INTERNAL_CALL, Pool._safeTransferFrom(address,address,address,uint256)(_tokenIn,msg.sender,TMP_335,amountIn)"];
+14->15;
+15[label="Node Type: EXPRESSION 15
+
+EXPRESSION:
+_safeTransfer(_tokenOut,_to,_amountOut)
+
+IRs:
+INTERNAL_CALL, Pool._safeTransfer(address,address,uint256)(_tokenOut,_to,_amountOut)"];
+15->16;
+16[label="Node Type: NEW VARIABLE 16
+
+EXPRESSION:
+m_reserveIn_ = IERC20(_tokenIn).balanceOf(address(this))
+
+IRs:
+TMP_338 = CONVERT _tokenIn to IERC20
+TMP_339 = CONVERT this to address
+TMP_340(uint256) = HIGH_LEVEL_CALL, dest:TMP_338(IERC20), function:balanceOf, arguments:['TMP_339']  
+m_reserveIn_(uint256) := TMP_340(uint256)"];
+16->17;
+17[label="Node Type: NEW VARIABLE 17
+
+EXPRESSION:
+m_reserveOut_ = IERC20(_tokenOut).balanceOf(address(this))
+
+IRs:
+TMP_341 = CONVERT _tokenOut to IERC20
+TMP_342 = CONVERT this to address
+TMP_343(uint256) = HIGH_LEVEL_CALL, dest:TMP_341(IERC20), function:balanceOf, arguments:['TMP_342']  
+m_reserveOut_(uint256) := TMP_343(uint256)"];
+17->18;
+18[label="Node Type: NEW VARIABLE 18
+
+EXPRESSION:
+after_price = PoolLibrary.getCurrentPrice(m_reserveIn_,m_reserveOut_,m_reserveInDecimals)
+
+IRs:
+TMP_344(uint256) = LIBRARY_CALL, dest:PoolLibrary, function:PoolLibrary.getCurrentPrice(uint256,uint256,uint256), arguments:['m_reserveIn_', 'm_reserveOut_', 'm_reserveInDecimals'] 
+after_price(uint256) := TMP_344(uint256)"];
+18->19;
+19[label="Node Type: EXPRESSION 19
+
+EXPRESSION:
+require(bool,string)(after_price >= low_price && after_price <= high_price,POOL : Out of range swap)
+
+IRs:
+TMP_345(bool) = after_price >= low_price
+TMP_346(bool) = after_price <= high_price
+TMP_347(bool) = TMP_345 && TMP_346
+TMP_348(None) = SOLIDITY_CALL require(bool,string)(TMP_347,POOL : Out of range swap)"];
+19->20;
+20[label="Node Type: EXPRESSION 20
+
+EXPRESSION:
+Swap(msg.sender,_to,amountIn,_amountOut,fee)
+
+IRs:
+Emit Swap(msg.sender,_to,amountIn,_amountOut,fee)"];
+21[label="Node Type: EXPRESSION 21
+
+EXPRESSION:
+nonReentrant()
+
+IRs:
+MODIFIER_CALL, ReentrancyGuard.nonReentrant()()"];
+21->22;
+22[label="Node Type: EXPRESSION 22
+
+EXPRESSION:
+ensure(_deadline)
+
+IRs:
+MODIFIER_CALL, Pool.ensure(uint256)(_deadline)"];
+22->23;
+23[label="Node Type: EXPRESSION 23
+
+EXPRESSION:
+zeroAddress(_to)
+
+IRs:
+MODIFIER_CALL, Pool.zeroAddress(address)(_to)"];
+23->24;
+24[label="Node Type: EXPRESSION 24
+
+EXPRESSION:
+zeroAddress(msg.sender)
+
+IRs:
+MODIFIER_CALL, Pool.zeroAddress(address)(msg.sender)"];
+24->1;
+}

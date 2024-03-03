@@ -95,14 +95,17 @@ contract FactoryTest is Test {
         _Pool memory struct1 = _Pool(address(DAI), address(USDC), 3000);
         _Pool memory struct2 = _Pool(address(DAI), address(WETH), 5000);
 
-        // check the struct of pools
-        assertEq(factory.getPoolData(pool1).tokenA, struct1.tokenA);
-        assertEq(factory.getPoolData(pool1).tokenB, struct1.tokenB);
-        assertEq(factory.getPoolData(pool1).fee, struct1.fee);
+        (address tokenA_1, address tokenB_1, uint fee_1) = factory.getPoolData(pool1);
+        (address tokenA_2, address tokenB_2, uint fee_2) = factory.getPoolData(pool2);
 
-        assertEq(factory.getPoolData(pool2).tokenA, struct2.tokenA);
-        assertEq(factory.getPoolData(pool2).tokenB, struct2.tokenB);
-        assertEq(factory.getPoolData(pool2).fee, struct2.fee);
+        // check the struct of pools
+        assertEq(tokenA_1, struct1.tokenA);
+        assertEq(tokenB_1, struct1.tokenB);
+        assertEq(fee_1, struct1.fee);
+
+        assertEq(tokenA_2, struct2.tokenA);
+        assertEq(tokenB_2, struct2.tokenB);
+        assertEq(fee_2, struct2.fee);
     }
 
     function test_ownerPools() external {

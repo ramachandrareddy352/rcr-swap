@@ -1,0 +1,46 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: NEW VARIABLE 1
+
+EXPRESSION:
+currentAllowance = allowance[owner][spender]
+
+IRs:
+REF_66(mapping(address => uint256)) -> allowance[owner]
+REF_67(uint256) -> REF_66[spender]
+currentAllowance(uint256) := REF_67(uint256)"];
+1->2;
+2[label="Node Type: IF 2
+
+EXPRESSION:
+currentAllowance != type()(uint256).max
+
+IRs:
+TMP_118(uint256) := 115792089237316195423570985008687907853269984665640564039457584007913129639935(uint256)
+TMP_119(bool) = currentAllowance != TMP_118
+CONDITION TMP_119"];
+2->3[label="True"];
+2->5[label="False"];
+3[label="Node Type: EXPRESSION 3
+
+EXPRESSION:
+require(bool,string)(currentAllowance >= value,LP_ERC20 : Invalid amount)
+
+IRs:
+TMP_120(bool) = currentAllowance >= value
+TMP_121(None) = SOLIDITY_CALL require(bool,string)(TMP_120,LP_ERC20 : Invalid amount)"];
+3->4;
+4[label="Node Type: EXPRESSION 4
+
+EXPRESSION:
+_approve(owner,spender,currentAllowance.sub(value),false)
+
+IRs:
+TMP_122(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.sub(uint256,uint256), arguments:['currentAllowance', 'value'] 
+INTERNAL_CALL, LP_ERC20._approve(address,address,uint256,bool)(owner,spender,TMP_122,False)"];
+4->5;
+5[label="Node Type: END_IF 5
+"];
+}

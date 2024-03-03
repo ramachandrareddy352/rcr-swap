@@ -1,0 +1,17 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool)((z = x + y) >= x == (y >= 0))
+
+IRs:
+TMP_456(int256) = x (c)+ y
+z(int256) := TMP_456(int256)
+TMP_457(bool) = z >= x
+TMP_458(bool) = y >= 0
+TMP_459(bool) = TMP_457 == TMP_458
+TMP_460(None) = SOLIDITY_CALL require(bool)(TMP_459)"];
+}

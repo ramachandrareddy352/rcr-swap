@@ -1,0 +1,228 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: NEW VARIABLE 1
+
+EXPRESSION:
+result = 0
+
+IRs:
+result(uint256) := 0(uint256)"];
+1->2;
+2[label="Node Type: IF 2
+
+EXPRESSION:
+value >= 10 ** 64
+
+IRs:
+TMP_542(uint256) = 10 ** 64
+TMP_543(bool) = value >= TMP_542
+CONDITION TMP_543"];
+2->3[label="True"];
+2->5[label="False"];
+3[label="Node Type: EXPRESSION 3
+
+EXPRESSION:
+value /= 10 ** 64
+
+IRs:
+TMP_544(uint256) = 10 ** 64
+value(uint256) = value / TMP_544"];
+3->4;
+4[label="Node Type: EXPRESSION 4
+
+EXPRESSION:
+result += 64
+
+IRs:
+result(uint256) = result + 64"];
+4->5;
+5[label="Node Type: END_IF 5
+"];
+5->6;
+6[label="Node Type: IF 6
+
+EXPRESSION:
+value >= 10 ** 32
+
+IRs:
+TMP_545(uint256) = 10 ** 32
+TMP_546(bool) = value >= TMP_545
+CONDITION TMP_546"];
+6->7[label="True"];
+6->9[label="False"];
+7[label="Node Type: EXPRESSION 7
+
+EXPRESSION:
+value /= 10 ** 32
+
+IRs:
+TMP_547(uint256) = 10 ** 32
+value(uint256) = value / TMP_547"];
+7->8;
+8[label="Node Type: EXPRESSION 8
+
+EXPRESSION:
+result += 32
+
+IRs:
+result(uint256) = result + 32"];
+8->9;
+9[label="Node Type: END_IF 9
+"];
+9->10;
+10[label="Node Type: IF 10
+
+EXPRESSION:
+value >= 10 ** 16
+
+IRs:
+TMP_548(uint256) = 10 ** 16
+TMP_549(bool) = value >= TMP_548
+CONDITION TMP_549"];
+10->11[label="True"];
+10->13[label="False"];
+11[label="Node Type: EXPRESSION 11
+
+EXPRESSION:
+value /= 10 ** 16
+
+IRs:
+TMP_550(uint256) = 10 ** 16
+value(uint256) = value / TMP_550"];
+11->12;
+12[label="Node Type: EXPRESSION 12
+
+EXPRESSION:
+result += 16
+
+IRs:
+result(uint256) = result + 16"];
+12->13;
+13[label="Node Type: END_IF 13
+"];
+13->14;
+14[label="Node Type: IF 14
+
+EXPRESSION:
+value >= 10 ** 8
+
+IRs:
+TMP_551(uint256) = 10 ** 8
+TMP_552(bool) = value >= TMP_551
+CONDITION TMP_552"];
+14->15[label="True"];
+14->17[label="False"];
+15[label="Node Type: EXPRESSION 15
+
+EXPRESSION:
+value /= 10 ** 8
+
+IRs:
+TMP_553(uint256) = 10 ** 8
+value(uint256) = value / TMP_553"];
+15->16;
+16[label="Node Type: EXPRESSION 16
+
+EXPRESSION:
+result += 8
+
+IRs:
+result(uint256) = result + 8"];
+16->17;
+17[label="Node Type: END_IF 17
+"];
+17->18;
+18[label="Node Type: IF 18
+
+EXPRESSION:
+value >= 10 ** 4
+
+IRs:
+TMP_554(uint256) = 10 ** 4
+TMP_555(bool) = value >= TMP_554
+CONDITION TMP_555"];
+18->19[label="True"];
+18->21[label="False"];
+19[label="Node Type: EXPRESSION 19
+
+EXPRESSION:
+value /= 10 ** 4
+
+IRs:
+TMP_556(uint256) = 10 ** 4
+value(uint256) = value / TMP_556"];
+19->20;
+20[label="Node Type: EXPRESSION 20
+
+EXPRESSION:
+result += 4
+
+IRs:
+result(uint256) = result + 4"];
+20->21;
+21[label="Node Type: END_IF 21
+"];
+21->22;
+22[label="Node Type: IF 22
+
+EXPRESSION:
+value >= 10 ** 2
+
+IRs:
+TMP_557(uint256) = 10 ** 2
+TMP_558(bool) = value >= TMP_557
+CONDITION TMP_558"];
+22->23[label="True"];
+22->25[label="False"];
+23[label="Node Type: EXPRESSION 23
+
+EXPRESSION:
+value /= 10 ** 2
+
+IRs:
+TMP_559(uint256) = 10 ** 2
+value(uint256) = value / TMP_559"];
+23->24;
+24[label="Node Type: EXPRESSION 24
+
+EXPRESSION:
+result += 2
+
+IRs:
+result(uint256) = result + 2"];
+24->25;
+25[label="Node Type: END_IF 25
+"];
+25->26;
+26[label="Node Type: IF 26
+
+EXPRESSION:
+value >= 10 ** 1
+
+IRs:
+TMP_560(uint256) = 10 ** 1
+TMP_561(bool) = value >= TMP_560
+CONDITION TMP_561"];
+26->27[label="True"];
+26->28[label="False"];
+27[label="Node Type: EXPRESSION 27
+
+EXPRESSION:
+result += 1
+
+IRs:
+result(uint256) = result + 1"];
+27->28;
+28[label="Node Type: END_IF 28
+"];
+28->29;
+29[label="Node Type: RETURN 29
+
+EXPRESSION:
+result
+
+IRs:
+RETURN result"];
+}

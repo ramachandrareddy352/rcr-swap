@@ -1,0 +1,15 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: RETURN 1
+
+EXPRESSION:
+s_getPair[_token0][_token1][_fee]
+
+IRs:
+REF_53(mapping(address => mapping(uint256 => address))) -> s_getPair[_token0]
+REF_54(mapping(uint256 => address)) -> REF_53[_token1]
+REF_55(address) -> REF_54[_fee]
+RETURN REF_55"];
+}

@@ -1,0 +1,16 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: RETURN 1
+
+EXPRESSION:
+(a & b) + (a ^ b) / 2
+
+IRs:
+TMP_452(uint256) = a & b
+TMP_453(uint256) = a ^ b
+TMP_454(uint256) = TMP_453 (c)/ 2
+TMP_455(uint256) = TMP_452 (c)+ TMP_454
+RETURN TMP_455"];
+}

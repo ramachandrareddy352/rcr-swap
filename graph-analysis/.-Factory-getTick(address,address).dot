@@ -1,0 +1,14 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: RETURN 1
+
+EXPRESSION:
+s_getTick[_token0][_token1]
+
+IRs:
+REF_51(mapping(address => uint256)) -> s_getTick[_token0]
+REF_52(uint256) -> REF_51[_token1]
+RETURN REF_52"];
+}

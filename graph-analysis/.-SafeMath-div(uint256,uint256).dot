@@ -1,0 +1,22 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(b > 0,SafeMath : Cannot divide by zero)
+
+IRs:
+TMP_444(bool) = b > 0
+TMP_445(None) = SOLIDITY_CALL require(bool,string)(TMP_444,SafeMath : Cannot divide by zero)"];
+1->2;
+2[label="Node Type: RETURN 2
+
+EXPRESSION:
+a / b
+
+IRs:
+TMP_446(uint256) = a (c)/ b
+RETURN TMP_446"];
+}

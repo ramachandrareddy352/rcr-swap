@@ -1,0 +1,30 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->3;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(newOwner != address(0),Ownable : Invaldi zero address)
+
+IRs:
+TMP_7 = CONVERT 0 to address
+TMP_8(bool) = newOwner != TMP_7
+TMP_9(None) = SOLIDITY_CALL require(bool,string)(TMP_8,Ownable : Invaldi zero address)"];
+1->2;
+2[label="Node Type: EXPRESSION 2
+
+EXPRESSION:
+_transferOwnership(newOwner)
+
+IRs:
+INTERNAL_CALL, Ownable._transferOwnership(address)(newOwner)"];
+3[label="Node Type: EXPRESSION 3
+
+EXPRESSION:
+onlyOwner()
+
+IRs:
+MODIFIER_CALL, Ownable.onlyOwner()()"];
+3->1;
+}

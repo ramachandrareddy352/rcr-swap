@@ -1,0 +1,24 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(value < uint256(type()(int256).max),SafeCast : Invalid number)
+
+IRs:
+TMP_416(int256) := 57896044618658097711785492504343953926634992332820282019728792003956564819967(int256)
+TMP_417 = CONVERT TMP_416 to uint256
+TMP_418(bool) = value < TMP_417
+TMP_419(None) = SOLIDITY_CALL require(bool,string)(TMP_418,SafeCast : Invalid number)"];
+1->2;
+2[label="Node Type: RETURN 2
+
+EXPRESSION:
+int256(value)
+
+IRs:
+TMP_420 = CONVERT value to int256
+RETURN TMP_420"];
+}

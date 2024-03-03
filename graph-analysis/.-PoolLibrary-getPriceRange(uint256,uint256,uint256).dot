@@ -1,0 +1,84 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: NEW VARIABLE 1
+
+EXPRESSION:
+fee_log_square = SafeMath.log2(_fee) * SafeMath.log2(_fee)
+
+IRs:
+TMP_401(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.log2(uint256), arguments:['_fee'] 
+TMP_402(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.log2(uint256), arguments:['_fee'] 
+TMP_403(uint256) = TMP_401 (c)* TMP_402
+fee_log_square(uint256) := TMP_403(uint256)"];
+1->2;
+2[label="Node Type: NEW VARIABLE 2
+
+EXPRESSION:
+avg_2_root = SafeMath.sqrt(2 * (fee_log_square + _tick))
+
+IRs:
+TMP_404(uint256) = fee_log_square (c)+ _tick
+TMP_405(uint256) = 2 (c)* TMP_404
+TMP_406(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.sqrt(uint256), arguments:['TMP_405'] 
+avg_2_root(uint256) := TMP_406(uint256)"];
+2->3;
+3[label="Node Type: NEW VARIABLE 3
+
+EXPRESSION:
+range = (before_Price * avg_2_root) / 100
+
+IRs:
+TMP_407(uint256) = before_Price (c)* avg_2_root
+TMP_408(uint256) = TMP_407 (c)/ 100
+range(uint256) := TMP_408(uint256)"];
+3->4;
+4[label="Node Type: IF 4
+
+EXPRESSION:
+range >= before_Price
+
+IRs:
+TMP_409(bool) = range >= before_Price
+CONDITION TMP_409"];
+4->5[label="True"];
+4->7[label="False"];
+5[label="Node Type: EXPRESSION 5
+
+EXPRESSION:
+low = 1
+
+IRs:
+low(uint256) := 1(uint256)"];
+5->6;
+6[label="Node Type: EXPRESSION 6
+
+EXPRESSION:
+high = before_Price + range
+
+IRs:
+TMP_410(uint256) = before_Price (c)+ range
+high(uint256) := TMP_410(uint256)"];
+6->9;
+7[label="Node Type: EXPRESSION 7
+
+EXPRESSION:
+low = before_Price - range
+
+IRs:
+TMP_411(uint256) = before_Price (c)- range
+low(uint256) := TMP_411(uint256)"];
+7->8;
+8[label="Node Type: EXPRESSION 8
+
+EXPRESSION:
+high = before_Price + range
+
+IRs:
+TMP_412(uint256) = before_Price (c)+ range
+high(uint256) := TMP_412(uint256)"];
+8->9;
+9[label="Node Type: END_IF 9
+"];
+}

@@ -1,0 +1,13 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: RETURN 1
+
+EXPRESSION:
+s_ownerPools[_owner]
+
+IRs:
+REF_45(uint256[]) -> s_ownerPools[_owner]
+RETURN REF_45"];
+}

@@ -1,0 +1,14 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+amountIn = (_amountIn.mul(_fee)).div(1000000)
+
+IRs:
+TMP_413(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.mul(uint256,uint256), arguments:['_amountIn', '_fee'] 
+TMP_414(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.div(uint256,uint256), arguments:['TMP_413', '1000000'] 
+amountIn(uint256) := TMP_414(uint256)"];
+}

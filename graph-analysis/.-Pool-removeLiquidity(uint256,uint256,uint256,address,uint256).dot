@@ -1,0 +1,125 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->11;
+1[label="Node Type: NEW VARIABLE 1
+
+EXPRESSION:
+m_tokenA = TOKENA
+
+IRs:
+m_tokenA(address) := TOKENA(address)"];
+1->2;
+2[label="Node Type: NEW VARIABLE 2
+
+EXPRESSION:
+m_tokenB = TOKENB
+
+IRs:
+m_tokenB(address) := TOKENB(address)"];
+2->3;
+3[label="Node Type: NEW VARIABLE 3
+
+EXPRESSION:
+m_pool = address(this)
+
+IRs:
+TMP_243 = CONVERT this to address
+m_pool(address) := TMP_243(address)"];
+3->4;
+4[label="Node Type: EXPRESSION 4
+
+EXPRESSION:
+(amountA,amountB) = _removeLiquidity(_liquidity,_amountAMin,_amountBMin,m_tokenA,m_tokenB,m_pool)
+
+IRs:
+TUPLE_3(uint256,uint256) = INTERNAL_CALL, Pool._removeLiquidity(uint256,uint256,uint256,address,address,address)(_liquidity,_amountAMin,_amountBMin,m_tokenA,m_tokenB,m_pool)
+amountA(uint256)= UNPACK TUPLE_3 index: 0 
+amountB(uint256)= UNPACK TUPLE_3 index: 1 "];
+4->5;
+5[label="Node Type: EXPRESSION 5
+
+EXPRESSION:
+_burn(msg.sender,_liquidity)
+
+IRs:
+INTERNAL_CALL, LP_ERC20._burn(address,uint256)(msg.sender,_liquidity)"];
+5->6;
+6[label="Node Type: EXPRESSION 6
+
+EXPRESSION:
+_safeTransfer(m_tokenA,_to,amountA)
+
+IRs:
+INTERNAL_CALL, Pool._safeTransfer(address,address,uint256)(m_tokenA,_to,amountA)"];
+6->7;
+7[label="Node Type: EXPRESSION 7
+
+EXPRESSION:
+_safeTransfer(m_tokenB,_to,amountB)
+
+IRs:
+INTERNAL_CALL, Pool._safeTransfer(address,address,uint256)(m_tokenB,_to,amountB)"];
+7->8;
+8[label="Node Type: EXPRESSION 8
+
+EXPRESSION:
+require(bool,string)(IERC20(m_tokenA).balanceOf(m_pool) > 0,POOL : Insufficient liquidity-A removed)
+
+IRs:
+TMP_247 = CONVERT m_tokenA to IERC20
+TMP_248(uint256) = HIGH_LEVEL_CALL, dest:TMP_247(IERC20), function:balanceOf, arguments:['m_pool']  
+TMP_249(bool) = TMP_248 > 0
+TMP_250(None) = SOLIDITY_CALL require(bool,string)(TMP_249,POOL : Insufficient liquidity-A removed)"];
+8->9;
+9[label="Node Type: EXPRESSION 9
+
+EXPRESSION:
+require(bool,string)(IERC20(m_tokenB).balanceOf(m_pool) > 0,POOL : Insufficient liquidity-B removed)
+
+IRs:
+TMP_251 = CONVERT m_tokenB to IERC20
+TMP_252(uint256) = HIGH_LEVEL_CALL, dest:TMP_251(IERC20), function:balanceOf, arguments:['m_pool']  
+TMP_253(bool) = TMP_252 > 0
+TMP_254(None) = SOLIDITY_CALL require(bool,string)(TMP_253,POOL : Insufficient liquidity-B removed)"];
+9->10;
+10[label="Node Type: EXPRESSION 10
+
+EXPRESSION:
+RemoveLiquidity(msg.sender,_to,_liquidity,amountA,amountB)
+
+IRs:
+Emit RemoveLiquidity(msg.sender,_to,_liquidity,amountA,amountB)"];
+11[label="Node Type: EXPRESSION 11
+
+EXPRESSION:
+nonReentrant()
+
+IRs:
+MODIFIER_CALL, ReentrancyGuard.nonReentrant()()"];
+11->12;
+12[label="Node Type: EXPRESSION 12
+
+EXPRESSION:
+ensure(_deadline)
+
+IRs:
+MODIFIER_CALL, Pool.ensure(uint256)(_deadline)"];
+12->13;
+13[label="Node Type: EXPRESSION 13
+
+EXPRESSION:
+zeroAddress(msg.sender)
+
+IRs:
+MODIFIER_CALL, Pool.zeroAddress(address)(msg.sender)"];
+13->14;
+14[label="Node Type: EXPRESSION 14
+
+EXPRESSION:
+zeroAddress(_to)
+
+IRs:
+MODIFIER_CALL, Pool.zeroAddress(address)(_to)"];
+14->1;
+}

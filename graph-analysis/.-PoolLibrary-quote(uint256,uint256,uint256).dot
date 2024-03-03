@@ -1,0 +1,34 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(_amountA > 0,Pool Library: Insufficient amount)
+
+IRs:
+TMP_372(bool) = _amountA > 0
+TMP_373(None) = SOLIDITY_CALL require(bool,string)(TMP_372,Pool Library: Insufficient amount)"];
+1->2;
+2[label="Node Type: EXPRESSION 2
+
+EXPRESSION:
+require(bool,string)(_reserveA > 0 && _reserveB > 0,Pool Library: Insufficient reservers)
+
+IRs:
+TMP_374(bool) = _reserveA > 0
+TMP_375(bool) = _reserveB > 0
+TMP_376(bool) = TMP_374 && TMP_375
+TMP_377(None) = SOLIDITY_CALL require(bool,string)(TMP_376,Pool Library: Insufficient reservers)"];
+2->3;
+3[label="Node Type: EXPRESSION 3
+
+EXPRESSION:
+amountB = (_amountA.mul(_reserveB)).div(_reserveA)
+
+IRs:
+TMP_378(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.mul(uint256,uint256), arguments:['_amountA', '_reserveB'] 
+TMP_379(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.div(uint256,uint256), arguments:['TMP_378', '_reserveA'] 
+amountB(uint256) := TMP_379(uint256)"];
+}

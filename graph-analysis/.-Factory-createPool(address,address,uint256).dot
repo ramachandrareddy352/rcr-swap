@@ -1,0 +1,213 @@
+digraph{
+0[label="Node Type: ENTRY_POINT 0
+"];
+0->1;
+1[label="Node Type: EXPRESSION 1
+
+EXPRESSION:
+require(bool,string)(_tokenA != address(0) && _tokenB != address(0),Factory : Invalid zero address)
+
+IRs:
+TMP_21 = CONVERT 0 to address
+TMP_22(bool) = _tokenA != TMP_21
+TMP_23 = CONVERT 0 to address
+TMP_24(bool) = _tokenB != TMP_23
+TMP_25(bool) = TMP_22 && TMP_24
+TMP_26(None) = SOLIDITY_CALL require(bool,string)(TMP_25,Factory : Invalid zero address)"];
+1->2;
+2[label="Node Type: EXPRESSION 2
+
+EXPRESSION:
+require(bool,string)(_tokenA != _tokenB,Factory : Identical tokens)
+
+IRs:
+TMP_27(bool) = _tokenA != _tokenB
+TMP_28(None) = SOLIDITY_CALL require(bool,string)(TMP_27,Factory : Identical tokens)"];
+2->3;
+3[label="Node Type: EXPRESSION 3
+
+EXPRESSION:
+require(bool,string)(_fee >= MIN_POOL_FEE && _fee <= MAX_POOL_FEE && _fee.mod(50) == 0,Factory : Invalid fee)
+
+IRs:
+TMP_29(bool) = _fee >= MIN_POOL_FEE
+TMP_30(bool) = _fee <= MAX_POOL_FEE
+TMP_31(bool) = TMP_29 && TMP_30
+TMP_32(uint256) = LIBRARY_CALL, dest:SafeMath, function:SafeMath.mod(uint256,uint256), arguments:['_fee', '50'] 
+TMP_33(bool) = TMP_32 == 0
+TMP_34(bool) = TMP_31 && TMP_33
+TMP_35(None) = SOLIDITY_CALL require(bool,string)(TMP_34,Factory : Invalid fee)"];
+3->4;
+4[label="Node Type: EXPRESSION 4
+
+EXPRESSION:
+require(bool,string)(s_getPair[_tokenA][_tokenB][_fee] == address(0),Factory : Pool alreday exist)
+
+IRs:
+REF_10(mapping(address => mapping(uint256 => address))) -> s_getPair[_tokenA]
+REF_11(mapping(uint256 => address)) -> REF_10[_tokenB]
+REF_12(address) -> REF_11[_fee]
+TMP_36 = CONVERT 0 to address
+TMP_37(bool) = REF_12 == TMP_36
+TMP_38(None) = SOLIDITY_CALL require(bool,string)(TMP_37,Factory : Pool alreday exist)"];
+4->5;
+5[label="Node Type: NEW VARIABLE 5
+"];
+5->6;
+6[label="Node Type: NEW VARIABLE 6
+"];
+6->20;
+8[label="Node Type: EXPRESSION 8
+
+EXPRESSION:
+s_poolCount ++
+
+IRs:
+TMP_39(uint256) := s_poolCount(uint256)
+s_poolCount(uint256) = s_poolCount (c)+ 1"];
+8->9;
+9[label="Node Type: NEW VARIABLE 9
+
+EXPRESSION:
+m_tick = s_getTick[m_token0][m_token1]
+
+IRs:
+REF_13(mapping(address => uint256)) -> s_getTick[m_token0]
+REF_14(uint256) -> REF_13[m_token1]
+m_tick(uint256) := REF_14(uint256)"];
+9->10;
+10[label="Node Type: NEW VARIABLE 10
+
+EXPRESSION:
+m_poolCount = s_poolCount
+
+IRs:
+m_poolCount(uint256) := s_poolCount(uint256)"];
+10->11;
+11[label="Node Type: NEW VARIABLE 11
+
+EXPRESSION:
+m_owner = msg.sender
+
+IRs:
+m_owner(address) := msg.sender(address)"];
+11->12;
+12[label="Node Type: EXPRESSION 12
+
+EXPRESSION:
+m_pair = address(new Pool(address(this),m_token0,m_token1,_fee,m_tick))
+
+IRs:
+TMP_41 = CONVERT this to address
+TMP_42(Pool) = new Pool(TMP_41,m_token0,m_token1,_fee,m_tick) 
+TMP_43 = CONVERT TMP_42 to address
+m_pair(address) := TMP_43(address)"];
+12->13;
+13[label="Node Type: EXPRESSION 13
+
+EXPRESSION:
+s_getPair[m_token0][m_token1][_fee] = m_pair
+
+IRs:
+REF_15(mapping(address => mapping(uint256 => address))) -> s_getPair[m_token0]
+REF_16(mapping(uint256 => address)) -> REF_15[m_token1]
+REF_17(address) -> REF_16[_fee]
+REF_17(address) (->s_getPair) := m_pair(address)"];
+13->14;
+14[label="Node Type: EXPRESSION 14
+
+EXPRESSION:
+s_getPair[m_token1][m_token0][_fee] = m_pair
+
+IRs:
+REF_18(mapping(address => mapping(uint256 => address))) -> s_getPair[m_token1]
+REF_19(mapping(uint256 => address)) -> REF_18[m_token0]
+REF_20(address) -> REF_19[_fee]
+REF_20(address) (->s_getPair) := m_pair(address)"];
+14->15;
+15[label="Node Type: EXPRESSION 15
+
+EXPRESSION:
+s_allPools.push(m_pair)
+
+IRs:
+REF_22 -> LENGTH s_allPools
+TMP_45(uint256) := REF_22(uint256)
+TMP_46(uint256) = TMP_45 (c)+ 1
+REF_22(uint256) (->s_allPools) := TMP_46(uint256)
+REF_23(address) -> s_allPools[TMP_45]
+REF_23(address) (->s_allPools) := m_pair(address)"];
+15->16;
+16[label="Node Type: EXPRESSION 16
+
+EXPRESSION:
+s_Pools[m_poolCount] = _Pool(m_token0,m_token1,_fee)
+
+IRs:
+REF_24(Factory._Pool) -> s_Pools[m_poolCount]
+TMP_47(Factory._Pool) = new _Pool(m_token0,m_token1,_fee)
+REF_24(Factory._Pool) (->s_Pools) := TMP_47(Factory._Pool)"];
+16->17;
+17[label="Node Type: EXPRESSION 17
+
+EXPRESSION:
+s_getPoolData[m_pair] = _Pool(m_token0,m_token1,_fee)
+
+IRs:
+REF_25(Factory._Pool) -> s_getPoolData[m_pair]
+TMP_48(Factory._Pool) = new _Pool(m_token0,m_token1,_fee)
+REF_25(Factory._Pool) (->s_getPoolData) := TMP_48(Factory._Pool)"];
+17->18;
+18[label="Node Type: EXPRESSION 18
+
+EXPRESSION:
+s_ownerPools[m_owner].push(m_poolCount)
+
+IRs:
+REF_26(uint256[]) -> s_ownerPools[m_owner]
+REF_28 -> LENGTH REF_26
+TMP_50(uint256) := REF_28(uint256)
+TMP_51(uint256) = TMP_50 (c)+ 1
+REF_28(uint256) (->s_ownerPools) := TMP_51(uint256)
+REF_29(uint256) -> REF_26[TMP_50]
+REF_29(uint256) (->s_ownerPools) := m_poolCount(uint256)"];
+18->19;
+19[label="Node Type: EXPRESSION 19
+
+EXPRESSION:
+PairCreated(m_poolCount,m_token0,m_token1,m_pair,_fee,m_tick,m_owner)
+
+IRs:
+Emit PairCreated(m_poolCount,m_token0,m_token1,m_pair,_fee,m_tick,m_owner)"];
+20[label="Node Type: IF 20
+
+EXPRESSION:
+_tokenA < _tokenB
+
+IRs:
+TMP_53(bool) = _tokenA < _tokenB
+CONDITION TMP_53"];
+20->21[label="True"];
+20->22[label="False"];
+21[label="Node Type: EXPRESSION 21
+
+EXPRESSION:
+(m_token0,m_token1) = (_tokenA,_tokenB)
+
+IRs:
+m_token0(address) := _tokenA(address)
+m_token1(address) := _tokenB(address)"];
+21->23;
+22[label="Node Type: EXPRESSION 22
+
+EXPRESSION:
+(m_token0,m_token1) = (_tokenB,_tokenA)
+
+IRs:
+m_token0(address) := _tokenB(address)
+m_token1(address) := _tokenA(address)"];
+22->23;
+23[label="Node Type: END_IF 23
+"];
+23->8;
+}
