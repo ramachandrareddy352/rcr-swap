@@ -8,6 +8,7 @@ import "forge-std/Vm.sol";
 import {Factory} from "../../src/Factory.sol";
 import {Pool} from "../../src/Pool.sol";
 import {ERC20} from "../helper/ERC20.sol";
+import {PoolLibrary} from "../helper/PoolLibrary.sol";
 
 import {CommonBase} from "forge-std/Base.sol";
 import {StdCheats} from "forge-std/StdCheats.sol";
@@ -17,14 +18,17 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     // apply all bounding functions and test them
     Factory internal factory;
     Pool[] internal pools;
+    PoolLibrary poolLibrary;
 
-    address[] traders = new address[](5);
+    address[] internal traders = new address[](5);
 
     ERC20 dai;
     ERC20 usdc;
     ERC20 weth;
     ERC20 wbtc;
     ERC20 unKnown;
+
+    address[] internal tokens = new address[](5);
 
     constructor(
         Factory _factory,
@@ -36,6 +40,8 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         ERC20 _unKnown
     ) {
         factory = _factory;
+        poolLibrary = new PoolLibrary();
+
         for (uint256 i = 0; i < _pools.length; i++) {
             pools.push(_pools[i]);
         }
@@ -44,6 +50,12 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         weth = _weth;
         wbtc = _wbtc;
         unKnown = _unKnown;
+
+        tokens.push(address(dai));
+        tokens.push(address(usdc));
+        tokens.push(address(weth));
+        tokens.push(address(wbtc));
+        tokens.push(address(unKnown));
 
         traders[0] = address(1);
         traders[1] = address(2);
@@ -86,39 +98,79 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         vm.stopPrank();
     }
 
-    // function removeLiquidity(uint256 _index, uint256 _liquidity, uint256 _amountAMin, uint256 _amountBMin, address _to)
-    //     public
-    // {
-    //     _index = bound(_index, 0, pools.length - 1);
-    //     vm.assume(_to != address(0));
-    //     pools[_index].removeLiquidity(_liquidity, _amountAMin, _amountBMin, _to, block.timestamp + 1);
-    // }
+    function removeLiquidity(uint256 _traderIndex, uint256 _poolIndex, uint256 _liquidity, address _to)
+        public
+    {
+        _traderIndex = _traderIndex % traders.length;
+        _poolIndex = _poolIndex % pools.length;
 
-    // function swapTokensExactInput(
-    //     uint256 _index,
-    //     uint256 _amountIn,
-    //     uint256 _amountOutMin,
-    //     address _tokenIn,
-    //     address _tokenOut,
-    //     address _to
-    // ) public {
-    //     _index = bound(_index, 0, pools.length - 1);
-    //     vm.assume(_to != address(0));
-    //     pools[_index].swapTokensExactInput(_amountIn, _amountOutMin, _tokenIn, _tokenOut, _to, block.timestamp + 1);
-    // }
+        Pool pool = pools[_poolIndex];
+        (address tokenA, address tokenB, ) = factory.getPoolData(address(pool));
+        uint256 traderLiquidityBalance = pool.balanceOf(traders[_traderIndex]);
+        
+        vm.startPrank(traders[_traderIndex]);
+        
+        vm.assume(traderLiquidityBalance > 0);
 
-    // function swapTokensExactOutput(
-    //     uint256 _index,
-    //     uint256 _amountOut,
-    //     uint256 _amountInMax,
-    //     address _tokenIn,
-    //     address _tokenOut,
-    //     address _to
-    // ) public {
-    //     _index = bound(_index, 0, pools.length - 1);
-    //     vm.assume(_to != address(0));
-    //     pools[_index].swapTokensExactOutput(_amountOut, _amountInMax, _tokenIn, _tokenOut, _to, block.timestamp + 1);
-    // }
+        pools[_poolIndex].removeLiquidity(traderLiquidityBalance, 0, 0, _to, block.timestamp + 1);
+
+        vm.stopPrank();
+    }
+
+    function swapTokensExactInput(
+        uint256 _traderIndex,
+        uint256 _poolIndex,
+        uint256 _amountIn,
+        address _to
+    ) public {
+        _traderIndex = _traderIndex % traders.length;
+        _poolIndex = _poolIndex % pools.length;
+        vm.assume(_amountIn > 0 && _amountIn < 1e24);
+
+        Pool pool = pools[_poolIndex];
+        address tokenIn = pool.TOKENA();
+        address tokenOut = pool.TOKENB();
+
+        vm.startPrank(traders[_traderIndex]);
+        
+        ERC20(tokenIn).mint(traders[_traderIndex], _amountIn);
+        ERC20(tokenIn).approve(address(pool), type(uint).max);
+        pool.swapTokensExactInput(_amountIn, 0, tokenIn, tokenOut, _to, block.timestamp + 1);
+
+        vm.stopPrank();
+    }
+
+    function swapTokensExactOutput(
+        uint256 _traderIndex,
+        uint256 _poolIndex,
+        uint256 _amountOut,
+        address _to
+    ) public {
+        _traderIndex = _traderIndex % traders.length;
+        _poolIndex = _poolIndex % pools.length;
+        vm.assume(_amountOut > 0 && _amountOut < 1e24);
+
+        Pool pool = pools[_poolIndex];
+        address tokenIn = pool.TOKENA();
+        address tokenOut = pool.TOKENB();
+
+        vm.startPrank(traders[_traderIndex]);
+
+        vm.assume(_amountOut < ERC20(tokenOut).balanceOf(address(pool)));
+
+        uint amountIn = poolLibrary.getAmountIn(
+            _amountOut, 
+            ERC20(tokenIn).balanceOf(address(pool)), 
+            ERC20(tokenOut).balanceOf(address(pool))
+        );
+        
+        ERC20(tokenIn).mint(traders[_traderIndex], amountIn + 100);
+        ERC20(tokenIn).approve(address(pool), type(uint).max);
+
+        pool.swapTokensExactOutput(_amountOut, type(uint).max, tokenIn, tokenOut, _to, block.timestamp + 1);
+
+        vm.stopPrank();
+    }
 }
 
 contract Pool_Handler_Test is Test {
